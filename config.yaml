@@ -1,0 +1,27 @@
+# Market Intelligence Configuration
+
+# Target countries for opportunity tracking
+countries:
+  - Bolivia
+  - Bangladesh
+  - Myanmar
+
+# Key sectors to monitor
+sectors:
+  - Agribusiness
+  - Ranching and livestock
+  - Fisheries and aquaculture
+  - Climate and environment
+
+# Opportunity types to track
+opportunity_types:
+  - Grants
+  - Tenders
+  - Subsidies
+  - Development programs
+
+# Report settings
+report:
+  title: "Market Intelligence Opportunity Report"
+  frequency: "weekly"
+  output_format: "markdown"
