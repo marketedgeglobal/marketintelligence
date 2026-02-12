@@ -1,0 +1,76 @@
+{
+  "opportunities": [
+    {
+      "title": "Sustainable Agriculture Development Grant",
+      "country": "Bolivia",
+      "sector": "Agribusiness",
+      "opportunity_type": "Grants",
+      "description": "Funding for sustainable agricultural practices and smallholder farmer development in rural Bolivia.",
+      "amount": "$500,000 - $2,000,000",
+      "deadline": "2026-04-15T00:00:00",
+      "source": "Inter-American Development Bank",
+      "url": "https://example.org/grants/bolivia-ag-2026",
+      "published_date": "2026-02-01T00:00:00"
+    },
+    {
+      "title": "Climate Resilience Infrastructure Tender",
+      "country": "Bangladesh",
+      "sector": "Climate and environment",
+      "opportunity_type": "Tenders",
+      "description": "Construction and implementation of climate-resilient infrastructure in coastal regions.",
+      "amount": "$10,000,000",
+      "deadline": "2026-03-30T00:00:00",
+      "source": "World Bank",
+      "url": "https://example.org/tenders/bangladesh-climate-2026",
+      "published_date": "2026-01-15T00:00:00"
+    },
+    {
+      "title": "Fisheries Modernization Program",
+      "country": "Myanmar",
+      "sector": "Fisheries and aquaculture",
+      "opportunity_type": "Development programs",
+      "description": "Program to modernize fishing practices and support sustainable aquaculture development.",
+      "amount": "$3,000,000",
+      "deadline": "2026-05-01T00:00:00",
+      "source": "Asian Development Bank",
+      "url": "https://example.org/programs/myanmar-fisheries-2026",
+      "published_date": "2026-02-05T00:00:00"
+    },
+    {
+      "title": "Livestock Health and Productivity Subsidy",
+      "country": "Bolivia",
+      "sector": "Ranching and livestock",
+      "opportunity_type": "Subsidies",
+      "description": "Subsidies for livestock health services and productivity improvements for ranchers.",
+      "amount": "$250,000",
+      "deadline": "2026-06-15T00:00:00",
+      "source": "Bolivian Ministry of Agriculture",
+      "url": "https://example.org/subsidies/bolivia-livestock-2026",
+      "published_date": "2026-02-10T00:00:00"
+    },
+    {
+      "title": "Aquaculture Technology Innovation Grant",
+      "country": "Bangladesh",
+      "sector": "Fisheries and aquaculture",
+      "opportunity_type": "Grants",
+      "description": "Support for innovative aquaculture technologies and practices in rural communities.",
+      "amount": "$750,000",
+      "deadline": "2026-04-20T00:00:00",
+      "source": "USAID",
+      "url": "https://example.org/grants/bangladesh-aqua-2026",
+      "published_date": "2026-01-28T00:00:00"
+    },
+    {
+      "title": "Environmental Conservation Development Program",
+      "country": "Myanmar",
+      "sector": "Climate and environment",
+      "opportunity_type": "Development programs",
+      "description": "Comprehensive program for forest conservation and biodiversity protection.",
+      "amount": "$5,000,000",
+      "deadline": "2026-07-01T00:00:00",
+      "source": "UN Environment Programme",
+      "url": "https://example.org/programs/myanmar-environment-2026",
+      "published_date": "2026-02-08T00:00:00"
+    }
+  ]
+}
