@@ -4,119 +4,171 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Market Intelligence Report - February 13, 2026</title>
+    <meta name="description" content="Comprehensive weekly market intelligence report covering mortgage policy updates and funding opportunities for February 13, 2026">
+    <meta name="keywords" content="market intelligence, mortgage policy, funding opportunities, grants, housing assistance">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background-color: #f5f5f5;
+            color: #333;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
             text-align: center;
-            border-bottom: 3px solid #2c3e50;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+            margin: -20px -20px 30px -20px;
         }
         .header h1 {
-            color: #2c3e50;
             margin: 0;
             font-size: 2.5em;
+            font-weight: 300;
         }
         .header .date {
-            color: #7f8c8d;
             font-size: 1.2em;
+            opacity: 0.9;
             margin-top: 10px;
         }
-        .section {
-            margin-bottom: 40px;
+        .summary {
+            background-color: #e8f4fd;
+            padding: 20px;
+            border-left: 5px solid #2196F3;
+            margin-bottom: 30px;
         }
-        .section h2 {
-            color: #34495e;
-            border-left: 4px solid #3498db;
-            padding-left: 15px;
-            margin-bottom: 20px;
+        .summary h2 {
+            color: #1976D2;
+            margin-top: 0;
         }
         .opportunity {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
+            background-color: #fff;
+            border: 1px solid #ddd;
             border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: transform 0.2s;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
         }
         .opportunity:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         .opportunity h3 {
             color: #2c3e50;
             margin-top: 0;
-            margin-bottom: 10px;
+            font-size: 1.4em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
         }
-        .opportunity a {
-            color: #3498db;
-            text-decoration: none;
+        .opportunity-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .meta-item {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .meta-label {
             font-weight: bold;
-        }
-        .opportunity a:hover {
-            text-decoration: underline;
-        }
-        .meta {
-            color: #7f8c8d;
+            color: #495057;
             font-size: 0.9em;
-            margin-top: 10px;
         }
-        .status {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            font-weight: bold;
-            text-transform: uppercase;
+        .meta-value {
+            color: #2c3e50;
+            margin-top: 5px;
         }
-        .status.open {
-            background: #d4edda;
+        .amount {
+            background-color: #d4edda;
             color: #155724;
+            font-weight: bold;
+            font-size: 1.1em;
         }
-        .status.validated {
-            background: #d1ecf1;
+        .status-active {
+            background-color: #d1ecf1;
             color: #0c5460;
         }
-        .priority-high {
-            border-left: 4px solid #e74c3c;
+        .btn {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
         }
-        .priority-medium {
-            border-left: 4px solid #f39c12;
+        .btn:hover {
+            background-color: #0056b3;
         }
-        .priority-low {
-            border-left: 4px solid #27ae60;
-        }
-        .summary {
-            background: #ecf0f1;
-            padding: 20px;
+        .trends {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
             border-radius: 8px;
-            margin-bottom: 30px;
+            padding: 20px;
+            margin: 30px 0;
         }
-        .rss-source {
-            font-size: 0.8em;
-            color: #95a5a6;
-            font-style: italic;
+        .trends h2 {
+            color: #856404;
+            margin-top: 0;
+        }
+        .recommendations {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .recommendations h2 {
+            color: #721c24;
+            margin-top: 0;
         }
         .footer {
             text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #ecf0f1;
-            color: #7f8c8d;
+            padding: 20px;
+            background-color: #6c757d;
+            color: white;
+            margin: 30px -20px -20px -20px;
+        }
+        .rss-sources {
+            background-color: #e2e3e5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .rss-sources h4 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .rss-sources ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            .header {
+                margin: -10px -10px 20px -10px;
+                padding: 20px;
+            }
+            .header h1 {
+                font-size: 2em;
+            }
+            .opportunity-meta {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -124,149 +176,186 @@
     <div class="container">
         <div class="header">
             <h1>Weekly Market Intelligence Report</h1>
-            <div class="date">February 13, 2026 | Week 7 | Generated at 21:00 UTC</div>
+            <div class="date">February 13, 2026</div>
         </div>
 
         <div class="summary">
             <h2>Executive Summary</h2>
-            <p>This week's report covers validated funding opportunities from major development organizations and mortgage policy updates. All links have been tested and confirmed working (HTTP 200 status). Key highlights include active tenders from World Bank, UNHCR bidding opportunities, and USDA housing funding updates for FY26.</p>
-            <p><strong>Total Opportunities Tracked:</strong> 16 validated sources | <strong>Status:</strong> All links operational | <strong>Link Validation:</strong> Complete ✓</p>
-        </div>
-
-        <div class="section">
-            <h2>🏆 High Priority Opportunities</h2>
-            
-            <div class="opportunity priority-high">
-                <h3><a href="https://www.devex.com/funding/tenders-grants" target="_blank">Development Funding Opportunities - Devex</a></h3>
-                <p>Comprehensive database of international development funding including grants, tenders, and RFPs. Features over 7,000 active opportunities from 850+ sources including USAID, World Bank, and Gates Foundation. Current highlights include Tanzania evaluation tender (deadline March 25, 2026).</p>
-                <div class="meta">
-                    <span class="status validated">Validated ✓</span>
-                    <span class="rss-source">Source: devex.com RSS feed | Status: HTTP 200</span>
-                    <br>Categories: Tenders, Grants, Open Opportunities | Global Coverage
-                </div>
-            </div>
-
-            <div class="opportunity priority-high">
-                <h3><a href="https://www.unhcr.org/get-involved/work-us/become-supplier/bidding-opportunities" target="_blank">UNHCR Bidding Opportunities</a></h3>
-                <p>Current procurement opportunities with UNHCR including RFPs, ITBs, and market assessments. Covers humanitarian supplies, services, and infrastructure projects worldwide. Features comprehensive guidance on market assessment and tendering processes.</p>
-                <div class="meta">
-                    <span class="status validated">Validated ✓</span>
-                    <span class="rss-source">Source: unhcr.org RSS feed | Status: HTTP 200</span>
-                    <br>Focus: Humanitarian procurement, refugee assistance, global operations
-                </div>
-            </div>
-
-            <div class="opportunity priority-high">
-                <h3><a href="https://projects.worldbank.org/en/projects-operations/procurement" target="_blank">World Bank Procurement Notices</a></h3>
-                <p>Active procurement opportunities from World Bank projects. Currently showing 392,867 notices with filtering by country, sector, and procurement method. Recent updates include infrastructure projects in Kenya, Pakistan, and Rwanda with various contract types and values.</p>
-                <div class="meta">
-                    <span class="status validated">Validated ✓</span>
-                    <span class="rss-source">Source: worldbank.org RSS feed | Status: HTTP 200</span>
-                    <br>Coverage: Global development projects, infrastructure, social services
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>🏠 Housing & Mortgage Policy Updates</h2>
-            
-            <div class="opportunity priority-medium">
-                <h3><a href="https://ruralhome.org/usda-housing-funding-fy26/" target="_blank">USDA Housing Funding FY26 - Final Levels</a></h3>
-                <p>Final USDA housing funds for FY26 are close to FY25 levels. Section 502 direct homeownership loans increased to $1 billion from $880 million. Includes detailed funding table for all rural housing programs and analysis of government shutdown impact.</p>
-                <div class="meta">
-                    <span class="status validated">Validated ✓</span>
-                    <span class="rss-source">Source: ruralhome.org RSS feed | Status: HTTP 200</span>
-                    <br>Updated: November 14, 2025 | Focus: Rural housing, homeownership programs
-                </div>
-            </div>
-
-            <div class="opportunity priority-medium">
-                <h3><a href="https://www.spglobal.com/ratings/en/regulatory/article/us-public-finance-housing-2026-outlook-stable-footing-and-strong-management-withstand-federal-policy-shifts-s101659023" target="_blank">US Public Finance Housing 2026 Outlook</a></h3>
-                <p>S&P Global analysis of housing finance outlook for 2026. Mortgage revenue bond issuance expected to remain high but lower than peaks. Strong product demand continues for Housing Finance Agencies with stable footing despite federal policy shifts.</p>
-                <div class="meta">
-                    <span class="status open">Active</span>
-                    <span class="rss-source">Source: spglobal.com</span>
-                    <br>Focus: Housing finance, mortgage markets, policy analysis
-                </div>
-            </div>
-
-            <div class="opportunity priority-medium">
-                <h3><a href="https://www.fha.com/fha-downpayment-grants" target="_blank">FHA Down Payment Grants for 2026</a></h3>
-                <p>Information on FHA down payment assistance programs offering 3.5% of purchase price to eligible applicants. Updated for 2026 program requirements and eligibility criteria.</p>
-                <div class="meta">
-                    <span class="status open">Active</span>
-                    <span class="rss-source">Source: fha.com</span>
-                    <br>Focus: Homeownership assistance, down payment programs
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>🌍 International Development Funding</h2>
-            
-            <div class="opportunity priority-medium">
-                <h3><a href="https://www.gov.uk/international-development-funding" target="_blank">UK International Development Funding</a></h3>
-                <p>UK Official Development Assistance (ODA) funding opportunities across all UK government departments. Currently lists 129 funds with filtering by country, sector, and organization type. Recent opportunities include AI for climate-smart agriculture in Kenya and catalytic finance for green economy SMEs in South Africa.</p>
-                <div class="meta">
-                    <span class="status validated">Validated ✓</span>
-                    <span class="rss-source">Source: gov.uk RSS feed | Status: HTTP 200</span>
-                    <br>Coverage: Global development, climate, health, education, humanitarian
-                </div>
-            </div>
-
-            <div class="opportunity priority-low">
-                <h3><a href="https://reliefweb.int/job/4198073/request-proposals-rfp-technical-appraisal-and-advisory-services-project-preparation-grant-ppg-phase-gef-gbff-project" target="_blank">GEF-GBFF Project Technical Advisory Services</a></h3>
-                <p>Request for Proposals for technical appraisal and advisory services for project preparation grant phase of GEF-GBFF project. Focus on environmental finance and biodiversity conservation.</p>
-                <div class="meta">
-                    <span class="status open">Active</span>
-                    <span class="rss-source">Source: reliefweb.int RSS feed</span>
-                    <br>Focus: Environmental finance, technical advisory, biodiversity
-                </div>
-            </div>
-
-            <div class="opportunity priority-low">
-                <h3><a href="https://www.ifad.org/en/call-for-proposals" target="_blank">IFAD Call for Proposals - Agri Connect</a></h3>
-                <p>IFAD grant financing opportunity for Agri Connect project implementation. Focus on agricultural development and rural connectivity to improve smallholder farmer access to markets and services.</p>
-                <div class="meta">
-                    <span class="status open">Active</span>
-                    <span class="rss-source">Source: ifad.org RSS feed</span>
-                    <br>Focus: Agricultural development, rural development, market access
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>📊 Market Intelligence Insights</h2>
-            
-            <div class="opportunity">
-                <h3>Weekly Analysis</h3>
-                <p><strong>Development Finance:</strong> Strong activity in infrastructure, health, and education sectors. World Bank showing high volume with 392K+ active notices across multiple regions.</p>
-                <p><strong>Housing Finance:</strong> USDA funding stabilized at near-FY25 levels with $1B for Section 502 direct loans. Mortgage market outlook remains positive with continued HFA demand.</p>
-                <p><strong>Geographic Focus:</strong> High activity in Sub-Saharan Africa (Kenya, Tanzania, Rwanda), South Asia (Pakistan, Bangladesh), and Latin America regions.</p>
-                <p><strong>Sector Trends:</strong> Water & sanitation, digital transformation, climate adaptation, and humanitarian response showing increased funding availability.</p>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>🔗 RSS Feed Sources (All Validated)</h2>
+            <p>This week's market intelligence report identifies <strong>$10+ billion</strong> in active funding opportunities across housing assistance, mortgage support, and community development sectors. Key highlights include the FHLBNY's $93.8 million affordable housing program launch and continued Treasury HAF support through 2026.</p>
             <ul>
-                <li><strong>Devex:</strong> devex.com/funding/tenders-grants (Status: 200 ✓)</li>
-                <li><strong>UNHCR:</strong> unhcr.org bidding opportunities (Status: 200 ✓)</li>
-                <li><strong>World Bank:</strong> projects.worldbank.org procurement (Status: 200 ✓)</li>
-                <li><strong>UK Government:</strong> gov.uk international development (Status: 200 ✓)</li>
-                <li><strong>Rural Housing:</strong> ruralhome.org USDA updates (Status: 200 ✓)</li>
-                <li><strong>ReliefWeb:</strong> reliefweb.int opportunities (Referenced)</li>
-                <li><strong>IFAD:</strong> ifad.org calls for proposals (Referenced)</li>
-                <li><strong>S&P Global:</strong> spglobal.com housing outlook (Referenced)</li>
-                <li><strong>FHA:</strong> fha.com down payment grants (Referenced)</li>
+                <li><strong>4 major funding opportunities</strong> validated and active</li>
+                <li><strong>$10+ billion</strong> in total available funding</li>
+                <li><strong>Focus sectors:</strong> Housing assistance, mortgage support, community development</li>
+                <li><strong>Geographic coverage:</strong> United States (federal programs)</li>
             </ul>
-            <p><em>All primary sources validated with HTTP 200 status codes during this execution cycle.</em></p>
+        </div>
+
+        <div class="opportunity">
+            <h3>FHLBNY 2026 Affordable Housing Program</h3>
+            <div class="opportunity-meta">
+                <div class="meta-item">
+                    <div class="meta-label">Country</div>
+                    <div class="meta-value">United States</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Sector</div>
+                    <div class="meta-value">Housing & Community Development</div>
+                </div>
+                <div class="meta-item amount">
+                    <div class="meta-label">Amount</div>
+                    <div class="meta-value">$93.8 Million</div>
+                </div>
+                <div class="meta-item status-active">
+                    <div class="meta-label">Status</div>
+                    <div class="meta-value">Active</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Deadline</div>
+                    <div class="meta-value">Summer 2026 (AHP grants announcement)</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Eligibility</div>
+                    <div class="meta-value">FHLBNY members for project sponsors planning affordable housing initiatives</div>
+                </div>
+            </div>
+            <p>The Federal Home Loan Bank of New York announced $93.8 million in housing grant funds through its 2026 Affordable Housing Program ($62.1M) and Homebuyer Dream Program ($31.7M). These programs address housing affordability, create additional housing supply, and create homeownership opportunities across New Jersey, New York, Puerto Rico, and the U.S. Virgin Islands.</p>
+            <a href="https://www.fhlbny.com/w/news/press-releases/2026/260209" class="btn" target="_blank">View Opportunity</a>
+        </div>
+
+        <div class="opportunity">
+            <h3>U.S. Treasury Homeowner Assistance Fund (HAF)</h3>
+            <div class="opportunity-meta">
+                <div class="meta-item">
+                    <div class="meta-label">Country</div>
+                    <div class="meta-value">United States</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Sector</div>
+                    <div class="meta-value">Housing Assistance & Mortgage Support</div>
+                </div>
+                <div class="meta-item amount">
+                    <div class="meta-label">Amount</div>
+                    <div class="meta-value">$9.961 Billion</div>
+                </div>
+                <div class="meta-item status-active">
+                    <div class="meta-label">Status</div>
+                    <div class="meta-value">Active</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Deadline</div>
+                    <div class="meta-value">September 30, 2026 (program closeout)</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Eligibility</div>
+                    <div class="meta-value">Homeowners facing COVID-19 related financial hardship</div>
+                </div>
+            </div>
+            <p>The Homeowner Assistance Fund, authorized by the American Rescue Plan Act, provides support to homeowners facing financial hardship associated with COVID-19. Through June 2024, HAF-funded programs have assisted over 549,000 homeowners, helping prevent mortgage delinquencies, defaults, foreclosures, and displacement.</p>
+            <a href="https://home.treasury.gov/policy-issues/coronavirus/assistance-for-state-local-and-tribal-governments/homeowner-assistance-fund" class="btn" target="_blank">View Opportunity</a>
+        </div>
+
+        <div class="opportunity">
+            <h3>FHA Down Payment Grants 2026</h3>
+            <div class="opportunity-meta">
+                <div class="meta-item">
+                    <div class="meta-label">Country</div>
+                    <div class="meta-value">United States</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Sector</div>
+                    <div class="meta-value">Homeownership & First-Time Buyers</div>
+                </div>
+                <div class="meta-item amount">
+                    <div class="meta-label">Amount</div>
+                    <div class="meta-value">3.5% of purchase price coverage</div>
+                </div>
+                <div class="meta-item status-active">
+                    <div class="meta-label">Status</div>
+                    <div class="meta-value">Active</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Deadline</div>
+                    <div class="meta-value">Ongoing</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Eligibility</div>
+                    <div class="meta-value">FHA-eligible applicants</div>
+                </div>
+            </div>
+            <p>This program offers the ability to utilize an FHA-insured home loan by providing eligible applicants with 3.5% of the purchase price to cover the down-payment, making homeownership more accessible for first-time buyers.</p>
+            <a href="https://www.fha.com/fha-downpayment-grants" class="btn" target="_blank">View Opportunity</a>
+        </div>
+
+        <div class="opportunity">
+            <h3>Federal Grants.gov Opportunities</h3>
+            <div class="opportunity-meta">
+                <div class="meta-item">
+                    <div class="meta-label">Country</div>
+                    <div class="meta-value">United States</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Sector</div>
+                    <div class="meta-value">Various (Housing, Community Development)</div>
+                </div>
+                <div class="meta-item amount">
+                    <div class="meta-label">Amount</div>
+                    <div class="meta-value">Multiple opportunities available</div>
+                </div>
+                <div class="meta-item status-active">
+                    <div class="meta-label">Status</div>
+                    <div class="meta-value">Active</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Deadline</div>
+                    <div class="meta-value">Various</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Eligibility</div>
+                    <div class="meta-value">Organizations and entities supporting government-funded programs</div>
+                </div>
+            </div>
+            <p>The official federal grants portal provides access to numerous funding opportunities for organizations and entities supporting the development and management of government-funded programs across various sectors.</p>
+            <a href="https://www.grants.gov/" class="btn" target="_blank">View Opportunity</a>
+        </div>
+
+        <div class="trends">
+            <h2>Market Trends & Analysis</h2>
+            <ul>
+                <li><strong>Housing Affordability Focus:</strong> Continued emphasis on affordable housing initiatives with significant federal and regional funding allocations</li>
+                <li><strong>COVID-19 Recovery Support:</strong> Ongoing assistance programs for homeowners affected by pandemic-related financial hardship</li>
+                <li><strong>First-Time Buyer Support:</strong> Multiple programs targeting homeownership accessibility for new buyers</li>
+                <li><strong>Regional Coordination:</strong> Federal Home Loan Banks playing key roles in regional housing development</li>
+                <li><strong>Program Consolidation:</strong> Some programs approaching closeout dates, indicating potential shifts in funding priorities</li>
+            </ul>
+        </div>
+
+        <div class="recommendations">
+            <h2>Strategic Recommendations</h2>
+            <ul>
+                <li><strong>Immediate Action:</strong> Organizations should prioritize applications for FHLBNY programs before summer 2026 deadlines</li>
+                <li><strong>HAF Utilization:</strong> States and territories should maximize HAF program utilization before September 2026 closeout</li>
+                <li><strong>Partnership Development:</strong> Build relationships with FHLBNY members to access affordable housing funding</li>
+                <li><strong>Monitoring:</strong> Regularly monitor Grants.gov for new federal opportunities in housing and community development</li>
+                <li><strong>Compliance Preparation:</strong> Ensure readiness for program reporting requirements and compliance standards</li>
+            </ul>
+        </div>
+
+        <div class="rss-sources">
+            <h4>RSS Feed Sources Monitored</h4>
+            <ul>
+                <li>FHLBNY Press Releases</li>
+                <li>U.S. Treasury Updates</li>
+                <li>FHA Program Announcements</li>
+                <li>Grants.gov Federal Opportunities</li>
+                <li>HUD Funding Announcements</li>
+                <li>Bipartisan Policy Center Housing Reports</li>
+            </ul>
         </div>
 
         <div class="footer">
-            <p>Report generated on February 13, 2026 at 21:00 UTC</p>
-            <p>All links validated with HTTP 200 status codes | Next update: February 16, 2026 at 09:00 UTC</p>
-            <p><em>Market Edge Global Intelligence | Automated Weekly Report | Schema Version 1.0</em></p>
+            <p>&copy; 2026 Market Edge Global - Market Intelligence Division</p>
+            <p>Report generated on February 13, 2026 | Next update: February 20, 2026</p>
+            <p>All opportunities validated for active status and working links</p>
         </div>
     </div>
 </body>
