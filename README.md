@@ -16,16 +16,16 @@ The final HTML report is published to GitHub Pages on a weekly schedule.
 
 ## Overview
 
-The PartnerAI Intelligence Report provides a structured, AI‑generated summary of the most relevant global development signals from the past 30 days. Zapier collects RSS items from multiple international sources and sends them directly to GitHub Actions, where the report is assembled and published.
+The PartnerAI Intelligence Report provides a structured, AI-generated summary of the most relevant global development signals from the past 30 days. Zapier collects RSS items from multiple international sources and sends them directly to GitHub Actions, where the report is assembled and published.
 
 ---
 
 ## Features
 
 - **Automated Weekly Reports**: Generated every Monday at 7:00 AM MT  
-- **Multi‑Source Coverage**: Pulls from major global development and humanitarian RSS feeds  
+- **Multi-Source Coverage**: Pulls from major global development and humanitarian RSS feeds  
 - **Signal Classification**: Categorizes items into Funding, Procurement, Humanitarian, Development Program, or Policy Update  
-- **Priority Scoring**: Ranks items using a 10‑point scoring model  
+- **Priority Scoring**: Ranks items using a 10-point scoring model  
 - **HTML Output**: Clean, structured report published to GitHub Pages  
 - **Direct Zapier Integration**: No database or Google Sheets required  
 
@@ -58,3 +58,51 @@ The PartnerAI Intelligence Report provides a structured, AI‑generated summary 
 ---
 
 ## Repository Structure
+
+```
+.
+|- .github/workflows/weekly-report.yml
+|- data/
+|- reports/
+|- src/
+|- templates/
+|- index.html
+`- README.md
+```
+
+---
+
+## GitHub Pages Deployment
+
+This repository publishes the latest report as a static site from the `main` branch root (`/`).
+
+- Pages URL: https://marketedgeglobal.github.io/marketintelligence/
+- Landing page: `index.html`
+- Latest report path pattern: `reports/partnerai-intel-report-YYYY-MM-DD.html`
+
+Important: keep `.nojekyll` in the repository root. This disables Jekyll processing so GitHub Pages serves files directly and does not attempt to parse Jinja syntax in `templates/report_template.md`.
+
+If enabling Pages for the first time:
+
+1. Go to **Settings -> Pages**.
+2. Set **Source** to **Deploy from a branch**.
+3. Select **Branch: `main`** and **Folder: `/ (root)`**.
+4. Save and wait for site status to show **built**.
+
+### Troubleshooting Status
+
+- **building**: Initial deployment is in progress. Wait a few minutes and refresh.
+- **failed**: Open the latest `pages-build-deployment` workflow logs and fix the reported error, then push again.
+- **built**: Deployment is complete and the site should be available at the Pages URL.
+
+Quick status check with GitHub CLI:
+
+```bash
+gh api repos/marketedgeglobal/marketintelligence/pages
+```
+
+Status-only output:
+
+```bash
+gh api repos/marketedgeglobal/marketintelligence/pages --jq '.status'
+```
