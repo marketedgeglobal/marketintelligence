@@ -1,0 +1,39 @@
+{
+  "items": [
+    {
+      "timestamp": "2026-02-12T10:00:00Z",
+      "feed_source": "UNICEF",
+      "title": "Call for Proposals: Emergency WASH response in Sudan",
+      "url": "https://example.org/funding-1",
+      "summary": "UNICEF opens a funding call for emergency response across multiple regions in Sudan.",
+      "raw_content": "Funding window open. Multi-country support and urgent humanitarian need.",
+      "author": "UNICEF",
+      "categories": [
+        "humanitarian",
+        "funding"
+      ]
+    },
+    {
+      "timestamp": "2026-01-20T10:00:00Z",
+      "feed_source": "World Bank",
+      "title": "Procurement Notice: Digital agriculture platform",
+      "url": "https://example.org/procurement-1",
+      "summary": "RFP for implementation partner in regional agriculture program.",
+      "raw_content": "Request for proposal for regional delivery.",
+      "categories": [
+        "procurement"
+      ]
+    },
+    {
+      "timestamp": "2025-12-01T10:00:00Z",
+      "feed_source": "Random Blog",
+      "title": "Weekly thought leadership blog",
+      "url": "https://example.org/blog-1",
+      "summary": "Opinion article",
+      "raw_content": "General reflections on development.",
+      "categories": [
+        "blog"
+      ]
+    }
+  ]
+}
