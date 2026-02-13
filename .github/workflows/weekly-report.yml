@@ -51,6 +51,9 @@ jobs:
             --event-path "$GITHUB_EVENT_PATH" \
             --output-dir reports \
             --index-path index.html \
+            --validate-links \
+            --fail-on-broken-links \
+            --link-validation-report reports/link-validation.txt \
             $SAVE_PATH \
             --payload-json "$PAYLOAD_JSON"
       

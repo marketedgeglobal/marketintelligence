@@ -9,6 +9,9 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
+from urllib import error as url_error
+from urllib import request as url_request
+from urllib.parse import urlparse
 
 from dateutil import parser as date_parser
 
@@ -425,6 +428,85 @@ def write_json(path: Path, payload: Any) -> None:
         json.dump(payload, file, indent=2, ensure_ascii=False)
 
 
+def check_url(url: str, timeout_seconds: float) -> tuple[int, str]:
+    parsed = urlparse(url)
+    if parsed.scheme not in {"http", "https"}:
+        return 0, "unsupported URL scheme"
+
+    headers = {"User-Agent": "PartnerAI-LinkValidator/1.0"}
+
+    def request_code(method: str) -> tuple[int, str]:
+        req = url_request.Request(url, headers=headers, method=method)
+        with url_request.urlopen(req, timeout=timeout_seconds) as response:
+            return int(response.getcode() or 0), ""
+
+    try:
+        return request_code("HEAD")
+    except url_error.HTTPError as exc:
+        if exc.code in {405, 501}:
+            try:
+                return request_code("GET")
+            except url_error.HTTPError as get_exc:
+                return int(get_exc.code), str(get_exc.reason or "HTTP error")
+            except url_error.URLError as get_exc:
+                return 0, str(get_exc.reason)
+            except Exception as get_exc:  # pragma: no cover
+                return 0, str(get_exc)
+
+        return int(exc.code), str(exc.reason or "HTTP error")
+    except url_error.URLError as exc:
+        return 0, str(exc.reason)
+    except Exception as exc:  # pragma: no cover
+        return 0, str(exc)
+
+
+def validate_item_links(items: list[IntelItem], timeout_seconds: float) -> list[dict[str, Any]]:
+    seen_urls: set[str] = set()
+    results: list[dict[str, Any]] = []
+
+    for entry in items:
+        if not entry.url or entry.url in seen_urls:
+            continue
+
+        seen_urls.add(entry.url)
+        status_code, detail = check_url(entry.url, timeout_seconds)
+        is_ok = 200 <= status_code < 400
+        results.append(
+            {
+                "title": entry.title,
+                "url": entry.url,
+                "status_code": status_code,
+                "ok": is_ok,
+                "detail": detail,
+            }
+        )
+
+    return results
+
+
+def write_link_validation_report(path: Path, results: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    checked = len(results)
+    broken = [row for row in results if not row["ok"]]
+
+    lines = [
+        "PartnerAI Link Validation",
+        f"Checked links: {checked}",
+        f"Broken links: {len(broken)}",
+        "",
+    ]
+
+    if broken:
+        lines.append("Broken URL details:")
+        for row in broken:
+            detail = row["detail"] or "No additional details"
+            lines.append(f"- [{row['status_code']}] {row['url']} :: {detail}")
+    else:
+        lines.append("No broken links detected.")
+
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate PartnerAI intelligence report from GitHub event payload")
     parser.add_argument("--event-path", required=True, help="Path to GitHub event JSON")
@@ -432,6 +514,10 @@ def main() -> None:
     parser.add_argument("--save-payload-path", default="", help="Optional path for saving normalized payload JSON")
     parser.add_argument("--payload-json", default="", help="Optional JSON string for items payload (workflow_dispatch support)")
     parser.add_argument("--index-path", default="index.html", help="Path to update with latest report")
+    parser.add_argument("--validate-links", action="store_true", help="Validate source URLs before publishing")
+    parser.add_argument("--fail-on-broken-links", action="store_true", help="Exit non-zero when broken links are found")
+    parser.add_argument("--link-check-timeout", type=float, default=10.0, help="Timeout per URL check in seconds")
+    parser.add_argument("--link-validation-report", default="", help="Optional path for writing link validation results")
     args = parser.parse_args()
 
     now_utc = datetime.now(timezone.utc)
@@ -452,6 +538,20 @@ def main() -> None:
     report_items = build_report_items(raw_items, now_utc)
     report_date = now_utc.strftime("%Y-%m-%d")
 
+    broken_links: list[dict[str, Any]] = []
+    if args.validate_links:
+        link_results = validate_item_links(report_items, args.link_check_timeout)
+        broken_links = [row for row in link_results if not row["ok"]]
+
+        if args.link_validation_report:
+            write_link_validation_report(Path(args.link_validation_report), link_results)
+
+        print(f"Links checked: {len(link_results)}")
+        print(f"Broken links found: {len(broken_links)}")
+        for row in broken_links:
+            detail = row["detail"] or "No additional details"
+            print(f"BROKEN [{row['status_code']}] {row['url']} :: {detail}")
+
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     output_file = output_dir / f"partnerai-intel-report-{report_date}.html"
@@ -467,6 +567,9 @@ def main() -> None:
     print(f"Generated report: {output_file}")
     print(f"Items processed: {len(raw_items)}")
     print(f"Items published: {len(report_items)}")
+
+    if args.fail_on_broken_links and broken_links:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
