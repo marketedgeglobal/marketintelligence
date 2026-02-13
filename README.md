@@ -1,163 +1,60 @@
-# Market Intelligence Opportunity Report
+# PartnerAI Intelligence Report
 
-This repository contains the automated weekly **Market Intelligence Opportunity Report**, a publication that tracks emerging funding opportunities across **Bolivia, Bangladesh, and Myanmar**. The report highlights grants, tenders, subsidies, and development programs across key sectors:
+This repository hosts the automated **PartnerAI Intelligence Report**, a weekly publication that analyzes global development, humanitarian, funding, and procurement activity from major international organizations. The report is generated automatically using RSS data delivered from Zapier and processed through GitHub Actions.
 
-- Agribusiness  
-- Ranching and livestock  
-- Fisheries and aquaculture  
-- Climate and environment
+The system identifies and scores opportunities across categories such as:
 
-## Overview
+- Funding  
+- Procurement  
+- Humanitarian updates  
+- Development programs  
+- Policy changes  
 
-The Market Intelligence Opportunity Report is designed to help organizations and individuals identify funding and development opportunities in key agricultural and environmental sectors across three focus countries. The report is automatically generated on a weekly basis using data from various sources.
-
-## Features
-
-- **Automated Weekly Reports**: Generates reports every Monday at 9:00 AM UTC
-- **Multi-Country Coverage**: Tracks opportunities in Bolivia, Bangladesh, and Myanmar
-- **Sector-Specific Insights**: Organizes opportunities by key sectors
-- **Multiple Opportunity Types**: Covers grants, tenders, subsidies, and development programs
-- **Structured Data**: Uses standardized data models for easy processing and analysis
-
-## Repository Structure
-
-```
-.
-├── .github/
-│   └── workflows/
-│       └── weekly-report.yml    # GitHub Actions workflow for automation
-├── config.yaml                   # Configuration file
-├── data/
-│   └── sample_opportunities.json # Sample opportunity data
-├── reports/                      # Generated reports (auto-created)
-├── src/
-│   ├── models.py                # Data models
-│   └── report_generator.py      # Report generation script
-├── templates/
-│   └── report_template.md       # Markdown template for reports
-├── requirements.txt             # Python dependencies
-└── README.md                    # This file
-```
-
-## Getting Started
-
-### Prerequisites
-
-- Python 3.8 or higher
-- pip (Python package installer)
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/marketedgeglobal/marketintelligence.git
-cd marketintelligence
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-### Usage
-
-#### Generate a Report Manually
-
-To generate a report with sample data:
-
-```bash
-cd src
-python report_generator.py ../data/sample_opportunities.json
-```
-
-The report will be generated in the `reports/` directory with a filename like `report_YYYYMMDD.md`.
-
-#### Add New Opportunities
-
-Opportunities should be added to a JSON file following this structure:
-
-```json
-{
-  "opportunities": [
-    {
-      "title": "Opportunity Title",
-      "country": "Bolivia|Bangladesh|Myanmar",
-      "sector": "Agribusiness|Ranching and livestock|Fisheries and aquaculture|Climate and environment",
-      "opportunity_type": "Grants|Tenders|Subsidies|Development programs",
-      "description": "Description of the opportunity",
-      "amount": "Funding amount (optional)",
-      "deadline": "2026-12-31T00:00:00 (optional)",
-      "source": "Source organization (optional)",
-      "url": "https://example.org/opportunity (optional)",
-      "published_date": "2026-01-01T00:00:00 (optional)"
-    }
-  ]
-}
-```
-
-## Automation
-
-The repository includes a GitHub Actions workflow that automatically:
-
-1. Runs every Monday at 9:00 AM UTC
-2. Generates a new report using the latest opportunity data
-3. Commits and pushes the report to the repository
-
-The workflow can also be triggered manually from the Actions tab in GitHub.
-
-## Configuration
-
-The `config.yaml` file contains the main configuration:
-
-- **countries**: List of target countries
-- **sectors**: Key sectors to monitor
-- **opportunity_types**: Types of opportunities to track
-- **report**: Report settings (title, frequency, output format)
-
-## Data Models
-
-### Opportunity
-
-Represents a single funding opportunity with the following attributes:
-
-- `title`: Name of the opportunity
-- `country`: Target country (Bolivia, Bangladesh, or Myanmar)
-- `sector`: Relevant sector
-- `opportunity_type`: Type of opportunity (grant, tender, subsidy, or development program)
-- `description`: Detailed description
-- `amount`: Funding amount (optional)
-- `deadline`: Application deadline (optional)
-- `source`: Source organization (optional)
-- `url`: Link to more information (optional)
-- `published_date`: Date the opportunity was published (optional)
-
-### Report
-
-Represents a complete market intelligence report with methods to:
-
-- Filter opportunities by country
-- Filter opportunities by sector
-- Filter opportunities by type
-
-## Contributing
-
-Contributions are welcome! To contribute new opportunities or improvements:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/new-opportunities`)
-3. Add your opportunities to the appropriate data file
-4. Commit your changes (`git commit -m 'Add new opportunities'`)
-5. Push to the branch (`git push origin feature/new-opportunities`)
-6. Open a Pull Request
-
-## License
-
-This project is open source and available for public use.
-
-## Contact
-
-For questions or suggestions, please open an issue in this repository.
+The final HTML report is published to GitHub Pages on a weekly schedule.
 
 ---
 
-**Generated weekly by GitHub Actions** | Last updated: Check the latest report in the `reports/` directory
+## Overview
+
+The PartnerAI Intelligence Report provides a structured, AI‑generated summary of the most relevant global development signals from the past 30 days. Zapier collects RSS items from multiple international sources and sends them directly to GitHub Actions, where the report is assembled and published.
+
+---
+
+## Features
+
+- **Automated Weekly Reports**: Generated every Monday at 7:00 AM MT  
+- **Multi‑Source Coverage**: Pulls from major global development and humanitarian RSS feeds  
+- **Signal Classification**: Categorizes items into Funding, Procurement, Humanitarian, Development Program, or Policy Update  
+- **Priority Scoring**: Ranks items using a 10‑point scoring model  
+- **HTML Output**: Clean, structured report published to GitHub Pages  
+- **Direct Zapier Integration**: No database or Google Sheets required  
+
+---
+
+## Data Flow
+
+1. **Zapier** monitors multiple RSS feeds.  
+2. When new items appear, Zapier sends a JSON payload to GitHub Actions.  
+3. **GitHub Actions** receives the payload, filters and scores the items, and generates the HTML report.  
+4. The report is committed to the repository and published via GitHub Pages.
+
+---
+
+## RSS Sources
+
+- DevelopmentAid Funding Updates  
+  https://www.developmentaid.org/api/frontend/funding/rss.xml  
+- ReliefWeb Humanitarian Updates  
+  https://reliefweb.int/updates/rss.xml  
+- UNDP Global Development Updates  
+  https://www.undp.org/rss.xml  
+- Asian Development Bank (ADB) Business Opportunities  
+  https://www.adb.org/rss/business-opportunities.xml  
+- IFAD Rural Development & Funding Updates  
+  https://www.ifad.org/en/web/latest/rss  
+- World Bank Procurement & Project Tenders  
+  https://projects.worldbank.org/en/projects-operations/procurement/rss  
+
+---
+
+## Repository Structure
