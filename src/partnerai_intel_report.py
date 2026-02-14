@@ -364,50 +364,6 @@ def render_html(report_date: str, items: list[IntelItem]) -> str:
 </html>
 """
 
-
-def render_index_html(report_path: str, report_date: str, item_count: int) -> str:
-        safe_path = html.escape(report_path)
-        safe_date = html.escape(report_date)
-        return f"""<!DOCTYPE html>
-<html lang=\"en\">
-<head>
-    <meta charset=\"UTF-8\" />
-    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />
-    <title>PartnerAI Intelligence Report</title>
-    <style>
-        :root {{ color-scheme: light; }}
-        body {{ font-family: Arial, sans-serif; margin: 0; background: #f5f7fb; color: #1a1f36; }}
-        main {{ max-width: 760px; margin: 0 auto; padding: 32px 24px; }}
-        .panel {{ background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px; }}
-        h1 {{ margin: 0 0 12px 0; }}
-        p {{ margin: 8px 0; }}
-        .button {{
-            display: inline-block;
-            margin-top: 16px;
-            background: #1d4ed8;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 8px;
-            padding: 10px 16px;
-            font-weight: 600;
-        }}
-        .button:hover {{ background: #1e40af; }}
-    </style>
-</head>
-<body>
-    <main>
-        <section class=\"panel\">
-            <h1>PartnerAI Intelligence Report</h1>
-            <p>Latest report date: {safe_date}</p>
-            <p>Published items: {item_count}</p>
-            <a class=\"button\" href=\"{safe_path}\">View Full Report</a>
-        </section>
-    </main>
-</body>
-</html>
-"""
-
-
 def score_item(item: dict[str, Any], timestamp: datetime, now_utc: datetime) -> IntelItem | None:
     combined_text = f"{item['title']} {item['summary']} {item['raw_content']} {' '.join(item['categories'])}"
     category, key_signal, signal_strength = classify_signal(combined_text)
