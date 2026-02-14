@@ -5,127 +5,188 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PartnerAI Intelligence Report - 2026-02-14</title>
   <style>
-        :root { color-scheme: light; }
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+            background: #020617;
+            color: #e2e8f0;
             line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-            color: #1f2937;
         }
+        a { color: #7dd3fc; }
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(2, 6, 23, 0.95);
+            border-bottom: 1px solid #0f172a;
+            backdrop-filter: blur(6px);
+        }
+        .header-inner,
         .container {
-            max-width: 1200px;
+            width: min(1100px, 92vw);
             margin: 0 auto;
+        }
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 16px 0;
+        }
+        .brand {
+            color: #f8fafc;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+        .top-nav {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+            font-size: 0.95rem;
+        }
+        .top-nav a {
+            color: #cbd5e1;
+            text-decoration: none;
+        }
+        .top-nav a:hover { color: #ffffff; }
+        .cta {
+            display: inline-block;
+            text-decoration: none;
             background: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            color: #0f172a !important;
+            border-radius: 999px;
+            font-weight: 700;
+            padding: 8px 14px;
         }
-        .header {
-            text-align: center;
-            border-bottom: 3px solid #2c3e50;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+        .hero {
+            padding: 56px 0 26px;
+            border-bottom: 1px solid #0f172a;
         }
-        .header h1 {
-            color: #2c3e50;
+        .hero h1 {
             margin: 0;
-            font-size: 2.25em;
+            color: #f8fafc;
+            font-size: clamp(2rem, 4.5vw, 3.2rem);
+            line-height: 1.15;
         }
-        .header .date {
-            color: #7f8c8d;
-            font-size: 1.05em;
+        .date {
             margin-top: 10px;
+            color: #94a3b8;
+            font-size: 1rem;
         }
-        .summary {
-            background: #ecf0f1;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
+        .container { padding: 28px 0 40px; }
+        .card {
+            background: #0b1226;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 24px;
         }
-        .summary h2 { margin-top: 0; color: #34495e; }
-        .summary p { margin: 8px 0; }
-        .section { margin-bottom: 36px; }
+        .summary h2,
         .section h2 {
-            color: #34495e;
-            border-left: 4px solid #3498db;
-            padding-left: 15px;
-            margin-bottom: 18px;
+            margin: 0 0 12px;
+            color: #f8fafc;
         }
+        .summary p,
+        .opportunity p,
+        .rss-source,
+        .empty,
+        .footer { color: #94a3b8; }
+        .section { margin-bottom: 24px; }
         .opportunity {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: transform 0.2s;
-        }
-        .opportunity:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: #111b33;
+            border: 1px solid #1e293b;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 14px;
         }
         .opportunity h3 {
-            color: #2c3e50;
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
+            margin: 0 0 10px;
+            color: #f8fafc;
+            font-size: 1.05rem;
         }
-        .opportunity a { color: #3498db; text-decoration: none; font-weight: 600; }
+        .opportunity a { text-decoration: none; font-weight: 600; }
         .opportunity a:hover { text-decoration: underline; }
-        .opportunity p { margin: 6px 0; }
         .meta {
-            color: #7f8c8d;
-            font-size: 0.9em;
-            margin-top: 10px;
+            margin-top: 12px;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             align-items: center;
+            font-size: 0.9em;
         }
         .status {
             display: inline-block;
             padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.78em;
-            font-weight: bold;
+            border-radius: 999px;
+            font-size: 0.74em;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.03em;
         }
-        .status.validated { background: #d1ecf1; color: #0c5460; }
-        .status.active { background: #d4edda; color: #155724; }
-        .status.watch { background: #fff3cd; color: #856404; }
-        .priority-high { border-left: 4px solid #e74c3c; }
-        .priority-medium { border-left: 4px solid #f39c12; }
-        .priority-low { border-left: 4px solid #27ae60; }
-        .rss-source { font-size: 0.86em; color: #6b7280; }
-        .source-list {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 14px 16px;
-        }
+        .status.validated { background: #0e7490; color: #ecfeff; }
+        .status.active { background: #166534; color: #ecfdf5; }
+        .status.watch { background: #92400e; color: #fffbeb; }
+        .priority-high .opportunity { border-left: 4px solid #ef4444; }
+        .priority-medium .opportunity { border-left: 4px solid #f59e0b; }
+        .priority-low .opportunity { border-left: 4px solid #22c55e; }
         .source-list ul { margin: 8px 0 0 18px; padding: 0; }
         .source-list li { margin: 4px 0; }
         .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #ecf0f1;
-            color: #7f8c8d;
-            font-size: 0.95em;
+            margin-top: 10px;
+            padding-top: 14px;
+            border-top: 1px solid #0f172a;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 20px;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.92rem;
         }
-        .empty { color: #6b7280; font-style: italic; }
+        .footer-links {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+        }
+        .footer-links a:hover { color: #f8fafc; }
+        @media (max-width: 920px) {
+            .header-inner { align-items: flex-start; flex-direction: column; }
+            .hero { padding-top: 42px; }
+        }
   </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-      <h1>PartnerAI Intelligence Report</h1>
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="https://marketedgeglobal.github.io/marketedgeglobal/">PartnerAI™</a>
+            <nav class="top-nav" aria-label="Top navigation">
+                <a href="https://marketedgeglobal.github.io/marketedgeglobal/features/">Features</a>
+                <a href="https://marketedgeglobal.github.io/marketedgeglobal/#insights">Insights</a>
+                <a href="https://marketedgeglobal.github.io/marketedgeglobal/explore-platform/">Explore platform</a>
+                <a href="https://marketedgeglobal.github.io/marketedgeglobal/explore-platform/ranking-tool/">Ranking tool</a>
+                <a href="https://marketedgeglobal.github.io/marketedgeglobal/#contact">Contact</a>
+                <a class="cta" href="mailto:info@marketedgeglobal.com">Request demo</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>PartnerAI Intelligence Report</h1>
             <div class="date">Reporting window: last 30 days | Generated: 2026-02-14</div>
         </div>
+    </section>
 
-        <div class="summary">
+    <div class="container">
+        <div class="summary card">
             <h2>Executive Summary</h2>
             <p>This report scans recent intelligence signals and highlights the strongest funding, procurement, and program opportunities by priority score.</p>
             <p><strong>Items scanned:</strong> 3 | <strong>Items published:</strong> 2 | <strong>Sources searched:</strong> 3</p>
@@ -133,9 +194,9 @@
             <p><strong>Top sources:</strong> Random Blog, UNICEF, World Bank</p>
         </div>
 
-    <section class="section priority-high">
+    <section class="section card priority-high">
   <h2>🏆 High Priority Opportunities</h2>
-  <article class="opportunity priority-high">
+  <article class="opportunity">
   <h3><a href="https://www.unicef.org/" target="_blank" rel="noopener noreferrer">Call for Proposals: Emergency WASH response in Sudan</a></h3>
   <p>UNICEF opens a funding call for emergency response across multiple regions in Sudan.</p>
   <p><strong>Opportunity type:</strong> Grant/Funding</p>
@@ -150,9 +211,9 @@
 </article>
 </section>
 
-<section class="section priority-medium">
+<section class="section card priority-medium">
   <h2>⚖️ Medium Priority Opportunities</h2>
-  <article class="opportunity priority-medium">
+    <article class="opportunity">
   <h3><a href="https://projects.worldbank.org/en/projects-operations/procurement/rss" target="_blank" rel="noopener noreferrer">Procurement Notice: Digital agriculture platform</a></h3>
   <p>RFP for implementation partner in regional agriculture program.</p>
   <p><strong>Opportunity type:</strong> Tender/Procurement</p>
@@ -167,12 +228,12 @@
 </article>
 </section>
 
-<section class="section priority-low">
+<section class="section card priority-low">
   <h2>🟢 Low Priority Opportunities</h2>
   <p class="empty">No qualifying items this period.</p>
 </section>
 
-        <section class="section">
+        <section class="section card">
             <h2>📊 Market Intelligence Insights</h2>
             <div class="opportunity">
                 <p><strong>Sector distribution:</strong> Agriculture (1), Water, Sanitation &amp; Hygiene (1)</p>
@@ -181,7 +242,7 @@
             </div>
         </section>
 
-        <section class="section">
+        <section class="section card">
             <h2>🔗 Sources Searched</h2>
             <div class="source-list">
                 <ul>
@@ -194,8 +255,12 @@
         </section>
 
         <div class="footer">
-            <p>Report generated on 2026-02-14</p>
-            <p>PartnerAI Intelligence | Automated Market Report</p>
+            <span>© 2026 MarketEdge. PartnerAI™ is a trademark of MarketEdge. All rights reserved.</span>
+            <div class="footer-links">
+                <a href="https://marketedgeglobal.github.io/marketedgeglobal/#privacy">Privacy</a>
+                <a href="https://marketedgeglobal.github.io/marketedgeglobal/#terms">Terms</a>
+                <a href="https://marketedgeglobal.github.io/marketedgeglobal/legal/">Legal</a>
+            </div>
         </div>
     </div>
 </body>
