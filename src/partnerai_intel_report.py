@@ -24,6 +24,11 @@ CATEGORY_LABELS = {
     "Policy Update": "Policy Update",
 }
 
+MONEY_PATTERN = re.compile(
+    r"(?:\$\s?\d[\d,]*(?:\.\d+)?(?:\s?(?:million|billion|m|bn))?|(?:usd|eur|gbp)\s?\d[\d,]*(?:\.\d+)?(?:\s?(?:million|billion|m|bn))?)",
+    re.IGNORECASE,
+)
+
 
 @dataclass
 class IntelItem:
@@ -36,6 +41,9 @@ class IntelItem:
     author: str
     categories: list[str]
     category: str
+    sector: str
+    funding_amount: str
+    opportunity_type: str
     key_signal: str
     score: int
     priority: str
@@ -90,6 +98,30 @@ def coerce_item(item: dict[str, Any]) -> dict[str, Any]:
     else:
         category_values = []
 
+    combined_text = normalize_text(
+        " ".join(
+            [
+                str(item.get("title") or ""),
+                str(item.get("summary") or item.get("description") or ""),
+                str(item.get("raw_content") or item.get("content") or ""),
+            ]
+        )
+    )
+
+    explicit_amount = normalize_text(
+        str(
+            item.get("amount")
+            or item.get("grant_amount")
+            or item.get("funding_amount")
+            or item.get("value")
+            or ""
+        )
+    )
+    extracted_amount = explicit_amount or extract_money_value(combined_text)
+
+    explicit_sector = normalize_text(str(item.get("sector") or item.get("focus_sector") or ""))
+    inferred_sector = explicit_sector or detect_sector(combined_text, category_values)
+
     return {
         "timestamp": item.get("timestamp") or item.get("pubDate") or item.get("published") or item.get("published_at"),
         "feed_source": normalize_text(str(item.get("feed_source") or item.get("source") or "Unknown Source")),
@@ -99,7 +131,49 @@ def coerce_item(item: dict[str, Any]) -> dict[str, Any]:
         "raw_content": normalize_text(str(item.get("raw_content") or item.get("content") or "")),
         "author": normalize_text(str(item.get("author") or "")),
         "categories": category_values,
+        "sector": inferred_sector,
+        "funding_amount": extracted_amount,
     }
+
+
+def extract_money_value(text: str) -> str:
+    if not text:
+        return ""
+
+    match = MONEY_PATTERN.search(text)
+    if not match:
+        return ""
+    return normalize_text(match.group(0))
+
+
+def detect_sector(text: str, categories: list[str]) -> str:
+    lowered = f"{text} {' '.join(categories)}".lower()
+    sector_rules: list[tuple[str, list[str]]] = [
+        ("Agriculture", ["agriculture", "agrifood", "farming", "crop", "food security"]),
+        ("Climate & Environment", ["climate", "environment", "resilience", "biodiversity", "conservation"]),
+        ("Water, Sanitation & Hygiene", ["wash", "sanitation", "water", "hygiene"]),
+        ("Health", ["health", "hospital", "disease", "medical", "vaccine"]),
+        ("Education", ["education", "schools", "learning", "curriculum"]),
+        ("Energy", ["energy", "renewable", "solar", "grid", "power"]),
+        ("Digital & ICT", ["digital", "ict", "data", "connectivity", "platform"]),
+    ]
+
+    for label, tokens in sector_rules:
+        if any(token in lowered for token in tokens):
+            return label
+    return ""
+
+
+def derive_opportunity_type(category: str) -> str:
+    if category == "Funding":
+        return "Grant/Funding"
+    if category == "Procurement":
+        return "Tender/Procurement"
+    if category == "Humanitarian Update":
+        return "Humanitarian"
+    if category == "Policy Update":
+        return "Policy"
+    return "Program"
 
 
 def dedupe_key(item: dict[str, Any]) -> str:
@@ -287,7 +361,7 @@ def priority_for_score(score: int) -> str:
     return "LOW PRIORITY"
 
 
-def render_html(report_date: str, items: list[IntelItem]) -> str:
+def render_html(report_date: str, items: list[IntelItem], source_counts: list[tuple[str, int]], total_scanned: int) -> str:
     grouped = {
         "HIGH PRIORITY": [entry for entry in items if entry.priority == "HIGH PRIORITY"],
         "MEDIUM PRIORITY": [entry for entry in items if entry.priority == "MEDIUM PRIORITY"],
@@ -300,9 +374,16 @@ def render_html(report_date: str, items: list[IntelItem]) -> str:
         ("Low Priority Opportunities", grouped["LOW PRIORITY"]),
     ]
 
+    source_badges = "".join(
+        f'<li><strong>{html.escape(name)}</strong> <span>({count})</span></li>' for name, count in source_counts
+    )
+
     def render_entry(entry: IntelItem) -> str:
         title = html.escape(entry.title)
         category = html.escape(CATEGORY_LABELS.get(entry.category, entry.category))
+        sector = html.escape(entry.sector or "Not specified")
+        funding_amount = html.escape(entry.funding_amount or "Not specified")
+        opportunity_type = html.escape(entry.opportunity_type)
         key_signal = html.escape(entry.key_signal)
         source = html.escape(entry.feed_source)
         score = entry.score
@@ -316,7 +397,10 @@ def render_html(report_date: str, items: list[IntelItem]) -> str:
         return (
             "<article class=\"entry\">"
             f"<h3>{title}</h3>"
+            f"<p><strong>Opportunity type:</strong> {opportunity_type}</p>"
             f"<p><strong>Category:</strong> {category}</p>"
+            f"<p><strong>Sector:</strong> {sector}</p>"
+            f"<p><strong>Grant/Funding amount:</strong> {funding_amount}</p>"
             f"<p><strong>Key signal:</strong> {key_signal}</p>"
             f"<p><strong>Score:</strong> {score}/10</p>"
             f"<p><strong>Source:</strong> {source_link}</p>"
@@ -349,6 +433,9 @@ def render_html(report_date: str, items: list[IntelItem]) -> str:
     .entry:first-of-type {{ border-top: none; padding-top: 0; margin-top: 0; }}
     .entry h3 {{ margin: 0 0 8px 0; font-size: 1.05rem; }}
     p {{ margin: 6px 0; }}
+        .meta {{ display: grid; gap: 16px; grid-template-columns: 1fr; }}
+        .meta ul {{ margin: 8px 0 0 18px; padding: 0; }}
+        .meta li {{ margin: 4px 0; }}
     .empty {{ color: #6b7280; font-style: italic; }}
   </style>
 </head>
@@ -358,6 +445,17 @@ def render_html(report_date: str, items: list[IntelItem]) -> str:
       <h1>PartnerAI Intelligence Report</h1>
       <p>Reporting window: last 30 days · Generated: {report_date}</p>
     </header>
+        <section class="meta">
+            <div>
+                <h2>Coverage Summary</h2>
+                <p><strong>Items scanned:</strong> {total_scanned}</p>
+                <p><strong>Items published:</strong> {len(items)}</p>
+            </div>
+            <div>
+                <h2>Sources Searched ({len(source_counts)})</h2>
+                <ul>{source_badges or '<li>No source metadata provided in payload.</li>'}</ul>
+            </div>
+        </section>
     {section_html}
   </main>
 </body>
@@ -389,6 +487,9 @@ def score_item(item: dict[str, Any], timestamp: datetime, now_utc: datetime) -> 
         author=item["author"],
         categories=item["categories"],
         category=category,
+        sector=item["sector"],
+        funding_amount=item["funding_amount"],
+        opportunity_type=derive_opportunity_type(category),
         key_signal=key_signal,
         score=score,
         priority=priority,
@@ -419,6 +520,15 @@ def build_report_items(raw_items: list[dict[str, Any]], now_utc: datetime) -> li
 
     final_items.sort(key=lambda entry: (entry.score, entry.timestamp), reverse=True)
     return final_items
+
+
+def summarize_sources(raw_items: list[dict[str, Any]]) -> list[tuple[str, int]]:
+    counts: dict[str, int] = {}
+    for raw_item in raw_items:
+        source = normalize_text(str(raw_item.get("feed_source") or raw_item.get("source") or "Unknown Source"))
+        counts[source] = counts.get(source, 0) + 1
+
+    return sorted(counts.items(), key=lambda row: (-row[1], row[0].lower()))
 
 
 def write_json(path: Path, payload: Any) -> None:
@@ -535,6 +645,7 @@ def main() -> None:
 
     raw_items = extract_items(payload)
     report_items = build_report_items(raw_items, now_utc)
+    source_counts = summarize_sources(raw_items)
     report_date = now_utc.strftime("%Y-%m-%d")
 
     broken_links: list[dict[str, Any]] = []
@@ -555,7 +666,7 @@ def main() -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     output_file = output_dir / f"partnerai-intel-report-{report_date}.html"
 
-    html_report = render_html(report_date, report_items)
+    html_report = render_html(report_date, report_items, source_counts, len(raw_items))
     output_file.write_text(html_report, encoding="utf-8")
 
     latest_html_file = output_dir / "latest.html"
