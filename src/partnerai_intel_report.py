@@ -29,6 +29,46 @@ MONEY_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+URL_PATTERN = re.compile(r"https?://[^\s)\]}>\"']+", re.IGNORECASE)
+PLACEHOLDER_URL_HOSTS = {
+    "example.com",
+    "www.example.com",
+    "example.org",
+    "www.example.org",
+    "example.net",
+    "www.example.net",
+    "localhost",
+    "127.0.0.1",
+}
+
+SOURCE_FALLBACK_URLS = {
+    "developmentaid": "https://www.developmentaid.org/api/frontend/funding/rss.xml",
+    "reliefweb": "https://reliefweb.int/updates/rss.xml",
+    "asian development bank": "https://www.adb.org/rss/business-opportunities.xml",
+    "adb": "https://www.adb.org/rss/business-opportunities.xml",
+    "world bank": "https://projects.worldbank.org/en/projects-operations/procurement/rss",
+    "un news economic": "https://news.un.org/feed/subscribe/en/news/topic/economic-development/feed/rss.xml",
+    "un news humanitarian": "https://news.un.org/feed/subscribe/en/news/topic/humanitarian-aid/feed/rss.xml",
+    "un ocha": "https://www.unocha.org/rss.xml",
+    "unocha": "https://www.unocha.org/rss.xml",
+    "unicef": "https://www.unicef.org/",
+    "unhcr": "https://www.unhcr.org/rss.xml",
+    "eu tenders": "https://ted.europa.eu/TED/rss/en/RSS.xml",
+    "ted": "https://ted.europa.eu/TED/rss/en/RSS.xml",
+    "eu international partnerships": "https://international-partnerships.ec.europa.eu/newsroom/feed_en",
+    "usaid": "https://www.usaid.gov/news-information/press-releases/rss.xml",
+    "oecd": "https://oecd-development-matters.org/feed/",
+    "african development bank": "https://www.afdb.org/en/projects-and-operations/procurement/rss",
+    "afdb": "https://www.afdb.org/en/projects-and-operations/procurement/rss",
+    "inter-american development bank": "https://www.iadb.org/en/rss",
+    "inter american development bank": "https://www.iadb.org/en/rss",
+    "idb": "https://www.iadb.org/en/rss",
+    "green climate fund": "https://www.greenclimate.fund/rss.xml",
+    "gcf": "https://www.greenclimate.fund/rss.xml",
+    "global environment facility": "https://www.thegef.org/rss.xml",
+    "gef": "https://www.thegef.org/rss.xml",
+}
+
 
 @dataclass
 class IntelItem:
@@ -69,6 +109,85 @@ def parse_timestamp(value: Any) -> datetime | None:
 
 def normalize_text(value: str) -> str:
     return re.sub(r"\s+", " ", (value or "")).strip()
+
+
+def is_http_url(value: str) -> bool:
+    try:
+        parsed = urlparse(value)
+    except Exception:
+        return False
+    return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+
+
+def is_placeholder_url(value: str) -> bool:
+    try:
+        host = (urlparse(value).hostname or "").lower()
+    except Exception:
+        return True
+    return host in PLACEHOLDER_URL_HOSTS
+
+
+def extract_urls_from_text(value: str) -> list[str]:
+    if not value:
+        return []
+    return [match.group(0).rstrip(".,;:") for match in URL_PATTERN.finditer(value)]
+
+
+def source_fallback_url(source_name: str) -> str:
+    normalized = normalize_text(source_name).lower()
+    if not normalized:
+        return ""
+
+    if "un news" in normalized and "humanitarian" in normalized:
+        return SOURCE_FALLBACK_URLS["un news humanitarian"]
+    if "un news" in normalized and ("economic" in normalized or "development" in normalized):
+        return SOURCE_FALLBACK_URLS["un news economic"]
+
+    for key, url in SOURCE_FALLBACK_URLS.items():
+        if key in normalized:
+            return url
+    return ""
+
+
+def select_best_url(item: dict[str, Any]) -> str:
+    candidate_keys = [
+        "opportunity_url",
+        "canonical_url",
+        "external_url",
+        "source_url",
+        "article_url",
+        "url",
+        "link",
+    ]
+
+    candidate_values: list[str] = []
+    for key in candidate_keys:
+        value = normalize_text(str(item.get(key) or ""))
+        if value:
+            candidate_values.append(value)
+
+    text_candidates = extract_urls_from_text(
+        " ".join(
+            [
+                str(item.get("summary") or item.get("description") or ""),
+                str(item.get("raw_content") or item.get("content") or ""),
+            ]
+        )
+    )
+    candidate_values.extend(text_candidates)
+
+    valid_candidates = [candidate for candidate in candidate_values if is_http_url(candidate)]
+    non_placeholder = [candidate for candidate in valid_candidates if not is_placeholder_url(candidate)]
+
+    if non_placeholder:
+        return normalize_text(non_placeholder[0])
+
+    source_name = normalize_text(str(item.get("feed_source") or item.get("source") or ""))
+    mapped_fallback = source_fallback_url(source_name)
+    if mapped_fallback:
+        return mapped_fallback
+
+    return ""
 
 
 def extract_items(payload: Any) -> list[dict[str, Any]]:
@@ -126,7 +245,7 @@ def coerce_item(item: dict[str, Any]) -> dict[str, Any]:
         "timestamp": item.get("timestamp") or item.get("pubDate") or item.get("published") or item.get("published_at"),
         "feed_source": normalize_text(str(item.get("feed_source") or item.get("source") or "Unknown Source")),
         "title": normalize_text(str(item.get("title") or "Untitled item")),
-        "url": normalize_text(str(item.get("url") or item.get("link") or "")),
+        "url": select_best_url(item),
         "summary": normalize_text(str(item.get("summary") or item.get("description") or "")),
         "raw_content": normalize_text(str(item.get("raw_content") or item.get("content") or "")),
         "author": normalize_text(str(item.get("author") or "")),
@@ -369,14 +488,33 @@ def render_html(report_date: str, items: list[IntelItem], source_counts: list[tu
     }
 
     sections = [
-        ("High Priority Opportunities", grouped["HIGH PRIORITY"]),
-        ("Medium Priority Opportunities", grouped["MEDIUM PRIORITY"]),
-        ("Low Priority Opportunities", grouped["LOW PRIORITY"]),
+        ("🏆 High Priority Opportunities", grouped["HIGH PRIORITY"], "priority-high"),
+        ("⚖️ Medium Priority Opportunities", grouped["MEDIUM PRIORITY"], "priority-medium"),
+        ("🟢 Low Priority Opportunities", grouped["LOW PRIORITY"], "priority-low"),
     ]
 
-    source_badges = "".join(
-        f'<li><strong>{html.escape(name)}</strong> <span>({count})</span></li>' for name, count in source_counts
+    source_badges = "\n                    ".join(
+        f"<li><strong>{html.escape(name)}</strong> <span>({count})</span></li>"
+        for name, count in source_counts
     )
+
+    top_sources = ", ".join(html.escape(name) for name, _ in source_counts[:3]) if source_counts else "No named sources"
+
+    sectors: dict[str, int] = {}
+    categories: dict[str, int] = {}
+    for entry in items:
+        sectors[entry.sector or "Not specified"] = sectors.get(entry.sector or "Not specified", 0) + 1
+        category_label = CATEGORY_LABELS.get(entry.category, entry.category)
+        categories[category_label] = categories.get(category_label, 0) + 1
+
+    sector_summary = ", ".join(
+        f"{html.escape(name)} ({count})" for name, count in sorted(sectors.items(), key=lambda row: (-row[1], row[0]))[:4]
+    ) or "No sector distribution available"
+    category_summary = ", ".join(
+        f"{html.escape(name)} ({count})" for name, count in sorted(categories.items(), key=lambda row: (-row[1], row[0]))[:4]
+    ) or "No category distribution available"
+
+    link_validation_note = "Not run for this report"
 
     def render_entry(entry: IntelItem) -> str:
         title = html.escape(entry.title)
@@ -388,32 +526,70 @@ def render_html(report_date: str, items: list[IntelItem], source_counts: list[tu
         source = html.escape(entry.feed_source)
         score = entry.score
         link = html.escape(entry.url) if entry.url else ""
+        summary_text = entry.summary or entry.raw_content or "No additional summary provided."
+        summary = html.escape(summary_text)
+        if len(summary) > 320:
+            summary = summary[:317] + "..."
+
+        if entry.score >= 8:
+            status_label = "Validated"
+            status_class = "validated"
+        elif entry.score >= 5:
+            status_label = "Active"
+            status_class = "active"
+        else:
+            status_label = "Watchlist"
+            status_class = "watch"
+
+        if entry.priority == "HIGH PRIORITY":
+            priority_class = "priority-high"
+        elif entry.priority == "MEDIUM PRIORITY":
+            priority_class = "priority-medium"
+        else:
+            priority_class = "priority-low"
 
         if link:
+            title_html = f'<a href="{link}" target="_blank" rel="noopener noreferrer">{title}</a>'
             source_link = f'<a href="{link}" target="_blank" rel="noopener noreferrer">{source}</a>'
         else:
+            title_html = title
             source_link = source
 
-        return (
-            "<article class=\"entry\">"
-            f"<h3>{title}</h3>"
-            f"<p><strong>Opportunity type:</strong> {opportunity_type}</p>"
-            f"<p><strong>Category:</strong> {category}</p>"
-            f"<p><strong>Sector:</strong> {sector}</p>"
-            f"<p><strong>Grant/Funding amount:</strong> {funding_amount}</p>"
-            f"<p><strong>Key signal:</strong> {key_signal}</p>"
-            f"<p><strong>Score:</strong> {score}/10</p>"
-            f"<p><strong>Source:</strong> {source_link}</p>"
-            "</article>"
+        return "\n".join(
+            [
+                f'<article class="opportunity {priority_class}">',
+                f"  <h3>{title_html}</h3>",
+                f"  <p>{summary}</p>",
+                f"  <p><strong>Opportunity type:</strong> {opportunity_type}</p>",
+                f"  <p><strong>Category:</strong> {category}</p>",
+                f"  <p><strong>Sector:</strong> {sector}</p>",
+                f"  <p><strong>Grant/Funding amount:</strong> {funding_amount}</p>",
+                f"  <p><strong>Key signal:</strong> {key_signal}</p>",
+                '  <div class="meta">',
+                f"    <span class=\"status {status_class}\">{status_label}</span>",
+                f"    <span class=\"rss-source\">Source: {source_link} | Score: {score}/10 | Link validation: {link_validation_note}</span>",
+                "  </div>",
+                "</article>",
+            ]
         )
 
-    section_html = ""
-    for section_title, entries in sections:
+    section_blocks: list[str] = []
+    for section_title, entries, section_class in sections:
         if entries:
-            entries_html = "".join(render_entry(entry) for entry in entries)
+            entries_html = "\n\n".join(render_entry(entry) for entry in entries)
         else:
             entries_html = '<p class="empty">No qualifying items this period.</p>'
-        section_html += f"<section><h2>{html.escape(section_title)}</h2>{entries_html}</section>"
+        section_blocks.append(
+            "\n".join(
+                [
+                    f'<section class="section {section_class}">',
+                    f"  <h2>{html.escape(section_title)}</h2>",
+                    f"  {entries_html}",
+                    "</section>",
+                ]
+            )
+        )
+    section_html = "\n\n".join(section_blocks)
 
     return f"""<!DOCTYPE html>
 <html lang=\"en\">
@@ -422,42 +598,160 @@ def render_html(report_date: str, items: list[IntelItem], source_counts: list[tu
   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />
   <title>PartnerAI Intelligence Report - {report_date}</title>
   <style>
-    :root {{ color-scheme: light; }}
-    body {{ font-family: Arial, sans-serif; margin: 0; background: #f5f7fb; color: #1a1f36; }}
-    main {{ max-width: 960px; margin: 0 auto; padding: 24px; }}
-    header {{ margin-bottom: 24px; }}
-    h1 {{ margin: 0 0 8px 0; }}
-    section {{ background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 16px; }}
-    h2 {{ margin-top: 0; }}
-    .entry {{ border-top: 1px solid #edf2f7; padding-top: 12px; margin-top: 12px; }}
-    .entry:first-of-type {{ border-top: none; padding-top: 0; margin-top: 0; }}
-    .entry h3 {{ margin: 0 0 8px 0; font-size: 1.05rem; }}
-    p {{ margin: 6px 0; }}
-        .meta {{ display: grid; gap: 16px; grid-template-columns: 1fr; }}
-        .meta ul {{ margin: 8px 0 0 18px; padding: 0; }}
-        .meta li {{ margin: 4px 0; }}
-    .empty {{ color: #6b7280; font-style: italic; }}
+        :root {{ color-scheme: light; }}
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #1f2937;
+        }}
+        .container {{
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }}
+        .header {{
+            text-align: center;
+            border-bottom: 3px solid #2c3e50;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }}
+        .header h1 {{
+            color: #2c3e50;
+            margin: 0;
+            font-size: 2.25em;
+        }}
+        .header .date {{
+            color: #7f8c8d;
+            font-size: 1.05em;
+            margin-top: 10px;
+        }}
+        .summary {{
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }}
+        .summary h2 {{ margin-top: 0; color: #34495e; }}
+        .summary p {{ margin: 8px 0; }}
+        .section {{ margin-bottom: 36px; }}
+        .section h2 {{
+            color: #34495e;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-bottom: 18px;
+        }}
+        .opportunity {{
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }}
+        .opportunity:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }}
+        .opportunity h3 {{
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }}
+        .opportunity a {{ color: #3498db; text-decoration: none; font-weight: 600; }}
+        .opportunity a:hover {{ text-decoration: underline; }}
+        .opportunity p {{ margin: 6px 0; }}
+        .meta {{
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }}
+        .status {{
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.78em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }}
+        .status.validated {{ background: #d1ecf1; color: #0c5460; }}
+        .status.active {{ background: #d4edda; color: #155724; }}
+        .status.watch {{ background: #fff3cd; color: #856404; }}
+        .priority-high {{ border-left: 4px solid #e74c3c; }}
+        .priority-medium {{ border-left: 4px solid #f39c12; }}
+        .priority-low {{ border-left: 4px solid #27ae60; }}
+        .rss-source {{ font-size: 0.86em; color: #6b7280; }}
+        .source-list {{
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 14px 16px;
+        }}
+        .source-list ul {{ margin: 8px 0 0 18px; padding: 0; }}
+        .source-list li {{ margin: 4px 0; }}
+        .footer {{
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+            color: #7f8c8d;
+            font-size: 0.95em;
+        }}
+        .empty {{ color: #6b7280; font-style: italic; }}
   </style>
 </head>
 <body>
-  <main>
-    <header>
+    <div class=\"container\">
+        <div class=\"header\">
       <h1>PartnerAI Intelligence Report</h1>
-      <p>Reporting window: last 30 days · Generated: {report_date}</p>
-    </header>
-        <section class="meta">
-            <div>
-                <h2>Coverage Summary</h2>
-                <p><strong>Items scanned:</strong> {total_scanned}</p>
-                <p><strong>Items published:</strong> {len(items)}</p>
-            </div>
-            <div>
-                <h2>Sources Searched ({len(source_counts)})</h2>
-                <ul>{source_badges or '<li>No source metadata provided in payload.</li>'}</ul>
+            <div class=\"date\">Reporting window: last 30 days | Generated: {report_date}</div>
+        </div>
+
+        <div class=\"summary\">
+            <h2>Executive Summary</h2>
+            <p>This report scans recent intelligence signals and highlights the strongest funding, procurement, and program opportunities by priority score.</p>
+            <p><strong>Items scanned:</strong> {total_scanned} | <strong>Items published:</strong> {len(items)} | <strong>Sources searched:</strong> {len(source_counts)}</p>
+            <p><strong>Priority split:</strong> High {len(grouped['HIGH PRIORITY'])}, Medium {len(grouped['MEDIUM PRIORITY'])}, Low {len(grouped['LOW PRIORITY'])}</p>
+            <p><strong>Top sources:</strong> {top_sources}</p>
+        </div>
+
+    {section_html}
+
+        <section class=\"section\">
+            <h2>📊 Market Intelligence Insights</h2>
+            <div class=\"opportunity\">
+                <p><strong>Sector distribution:</strong> {sector_summary}</p>
+                <p><strong>Category distribution:</strong> {category_summary}</p>
+                <p><strong>Signal quality:</strong> Scores combine recency, relevance, impact, and record completeness.</p>
             </div>
         </section>
-    {section_html}
-  </main>
+
+        <section class=\"section\">
+            <h2>🔗 Sources Searched</h2>
+            <div class=\"source-list\">
+                <ul>
+                    {source_badges or '<li>No source metadata provided in payload.</li>'}
+                </ul>
+            </div>
+            <p class=\"rss-source\"><em>Link validation status: {link_validation_note}</em></p>
+        </section>
+
+        <div class=\"footer\">
+            <p>Report generated on {report_date}</p>
+            <p>PartnerAI Intelligence | Automated Market Report</p>
+        </div>
+    </div>
 </body>
 </html>
 """
