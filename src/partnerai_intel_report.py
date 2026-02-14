@@ -4,7 +4,6 @@ import argparse
 import hashlib
 import html
 import json
-import os
 import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -610,9 +609,7 @@ def main() -> None:
     latest_marker.write_text(str(output_file), encoding="utf-8")
 
     index_path = Path(args.index_path)
-    index_report_path = os.path.relpath(latest_html_file, start=index_path.parent).replace("\\", "/")
-    index_html = render_index_html(index_report_path, report_date, len(report_items))
-    index_path.write_text(index_html, encoding="utf-8")
+    index_path.write_text(html_report, encoding="utf-8")
 
     print(f"Generated report: {output_file}")
     print(f"Items processed: {len(raw_items)}")
