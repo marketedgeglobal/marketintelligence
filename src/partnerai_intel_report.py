@@ -194,13 +194,28 @@ def extract_items(payload: Any) -> list[dict[str, Any]]:
     if isinstance(payload, list):
         return [entry for entry in payload if isinstance(entry, dict)]
 
+    if isinstance(payload, str):
+        text = payload.strip()
+        if not text:
+            return []
+        try:
+            return extract_items(json.loads(text))
+        except Exception:
+            return []
+
     if not isinstance(payload, dict):
         return []
 
-    for key in ("items", "rss_items", "entries", "records", "data"):
+    for key in ("items", "rss_items", "entries", "records", "data", "opportunities"):
         items = payload.get(key)
         if isinstance(items, list):
             return [entry for entry in items if isinstance(entry, dict)]
+
+    for key in ("payload", "client_payload", "body", "event"):
+        nested = payload.get(key)
+        nested_items = extract_items(nested)
+        if nested_items:
+            return nested_items
 
     if all(key in payload for key in ("title", "url")):
         return [payload]
@@ -242,12 +257,26 @@ def coerce_item(item: dict[str, Any]) -> dict[str, Any]:
     inferred_sector = explicit_sector or detect_sector(combined_text, category_values)
 
     return {
-        "timestamp": item.get("timestamp") or item.get("pubDate") or item.get("published") or item.get("published_at"),
+        "timestamp": (
+            item.get("timestamp")
+            or item.get("pubDate")
+            or item.get("published")
+            or item.get("published_at")
+            or item.get("published_date")
+            or item.get("isoDate")
+            or item.get("date")
+            or item.get("created_at")
+            or item.get("updated_at")
+        ),
         "feed_source": normalize_text(str(item.get("feed_source") or item.get("source") or "Unknown Source")),
         "title": normalize_text(str(item.get("title") or "Untitled item")),
         "url": select_best_url(item),
-        "summary": normalize_text(str(item.get("summary") or item.get("description") or "")),
-        "raw_content": normalize_text(str(item.get("raw_content") or item.get("content") or "")),
+        "summary": normalize_text(
+            str(item.get("summary") or item.get("description") or item.get("contentSnippet") or "")
+        ),
+        "raw_content": normalize_text(
+            str(item.get("raw_content") or item.get("content") or item.get("content:encoded") or "")
+        ),
         "author": normalize_text(str(item.get("author") or "")),
         "categories": category_values,
         "sector": inferred_sector,
@@ -927,17 +956,36 @@ def main() -> None:
     event_data = load_json(Path(args.event_path))
 
     payload: Any = event_data
-    if isinstance(event_data, dict) and isinstance(event_data.get("client_payload"), dict):
-        payload = event_data["client_payload"]
+    if isinstance(event_data, dict) and event_data.get("client_payload") is not None:
+        payload = event_data.get("client_payload")
 
     if args.payload_json.strip():
         parsed_override = json.loads(args.payload_json)
         payload = parsed_override
 
-    if args.save_payload_path:
-        write_json(Path(args.save_payload_path), payload)
-
     raw_items = extract_items(payload)
+    if not raw_items:
+        raw_items = extract_items(event_data)
+
+    if not raw_items and args.save_payload_path:
+        save_path = Path(args.save_payload_path)
+        if save_path.exists():
+            saved_payload = load_json(save_path)
+            saved_items = extract_items(saved_payload)
+            if saved_items:
+                payload = saved_payload
+                raw_items = saved_items
+
+    if args.save_payload_path:
+        if raw_items:
+            write_json(Path(args.save_payload_path), payload)
+        else:
+            print("No items extracted from payload; skipped overwriting saved payload file.")
+
+    if not raw_items:
+        print("No report items available after payload extraction; skipping report regeneration.")
+        return
+
     report_items = build_report_items(raw_items, now_utc)
     source_counts = summarize_sources(raw_items)
     report_date = now_utc.strftime("%Y-%m-%d")
