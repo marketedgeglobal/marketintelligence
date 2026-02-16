@@ -95,6 +95,13 @@ If enabling Pages for the first time:
 - **failed**: Open the latest `pages-build-deployment` workflow logs and fix the reported error, then push again.
 - **built**: Deployment is complete and the site should be available at the Pages URL.
 
+### CI Guards
+
+The weekly workflow includes two safeguards to prevent broken Pages output:
+
+- **Root-level duplicate report guard**: fails if any `partnerai-*.html` file exists at repository root (reports must stay under `reports/`).
+- **Unresolved template token guard**: fails if tracked HTML files contain unresolved templating markers before commit.
+
 Quick status check with GitHub CLI:
 
 ```bash

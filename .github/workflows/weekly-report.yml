@@ -56,6 +56,28 @@ jobs:
             --link-validation-report reports/link-validation.txt \
             $SAVE_PATH \
             --payload-json "$PAYLOAD_JSON"
+
+      - name: Guard against root-level report duplicates
+        run: |
+          set -euo pipefail
+          offending_files=$(find . -maxdepth 1 -type f -name 'partnerai-*.html' -print)
+
+          if [ -n "$offending_files" ]; then
+            echo "::error::Root-level partnerai report HTML files are not allowed. Keep report outputs under reports/."
+            echo "$offending_files"
+            exit 1
+          fi
+
+      - name: Guard against unresolved template tokens in HTML
+        run: |
+          set -euo pipefail
+          unresolved_tokens=$(git grep -nE '\{\{[^{}]+\}\}|\{%[^%]+%\}|\{#[^#]+#\}' -- '*.html' || true)
+
+          if [ -n "$unresolved_tokens" ]; then
+            echo "::error::Unresolved template tokens found in tracked HTML files."
+            echo "$unresolved_tokens"
+            exit 1
+          fi
       
       - name: Commit and push report
         run: |
