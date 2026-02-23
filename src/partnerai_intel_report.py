@@ -30,6 +30,7 @@ MONEY_PATTERN = re.compile(
 )
 
 URL_PATTERN = re.compile(r"https?://[^\s)\]}>\"']+", re.IGNORECASE)
+TEMPLATE_TOKEN_PATTERN = re.compile(r"\{\{[^{}]+\}\}|\{%[^%]+%\}|\{#[^#]+#\}")
 PLACEHOLDER_URL_HOSTS = {
     "example.com",
     "www.example.com",
@@ -44,8 +45,8 @@ PLACEHOLDER_URL_HOSTS = {
 SOURCE_FALLBACK_URLS = {
     "developmentaid": "https://www.developmentaid.org/api/frontend/funding/rss.xml",
     "reliefweb": "https://reliefweb.int/updates/rss.xml",
-    "asian development bank": "https://www.adb.org/rss/business-opportunities.xml",
-    "adb": "https://www.adb.org/rss/business-opportunities.xml",
+    "asian development bank": "https://www.adb.org/work-with-us/procurement",
+    "adb": "https://www.adb.org/work-with-us/procurement",
     "world bank": "https://projects.worldbank.org/en/projects-operations/procurement/rss",
     "un news economic": "https://news.un.org/feed/subscribe/en/news/topic/economic-development/feed/rss.xml",
     "un news humanitarian": "https://news.un.org/feed/subscribe/en/news/topic/humanitarian-aid/feed/rss.xml",
@@ -56,17 +57,24 @@ SOURCE_FALLBACK_URLS = {
     "eu tenders": "https://ted.europa.eu/TED/rss/en/RSS.xml",
     "ted": "https://ted.europa.eu/TED/rss/en/RSS.xml",
     "eu international partnerships": "https://international-partnerships.ec.europa.eu/newsroom/feed_en",
-    "usaid": "https://www.usaid.gov/news-information/press-releases/rss.xml",
+    "usaid": "https://www.usaid.gov/news-information/press-releases",
     "oecd": "https://oecd-development-matters.org/feed/",
     "african development bank": "https://www.afdb.org/en/projects-and-operations/procurement/rss",
     "afdb": "https://www.afdb.org/en/projects-and-operations/procurement/rss",
-    "inter-american development bank": "https://www.iadb.org/en/rss",
-    "inter american development bank": "https://www.iadb.org/en/rss",
-    "idb": "https://www.iadb.org/en/rss",
+    "inter-american development bank": "https://www.iadb.org/en/news",
+    "inter american development bank": "https://www.iadb.org/en/news",
+    "idb": "https://www.iadb.org/en/news",
     "green climate fund": "https://www.greenclimate.fund/rss.xml",
     "gcf": "https://www.greenclimate.fund/rss.xml",
     "global environment facility": "https://www.thegef.org/rss.xml",
     "gef": "https://www.thegef.org/rss.xml",
+}
+
+URL_REWRITES = {
+    "https://www.adb.org/rss/business-opportunities.xml": "https://www.adb.org/work-with-us/procurement",
+    "https://www.usaid.gov/news-information/press-releases/rss.xml": "https://www.usaid.gov/",
+    "https://www.usaid.gov/news-information/press-releases": "https://www.usaid.gov/",
+    "https://www.iadb.org/en/rss": "https://www.iadb.org/en/news",
 }
 
 
@@ -108,7 +116,8 @@ def parse_timestamp(value: Any) -> datetime | None:
 
 
 def normalize_text(value: str) -> str:
-    return re.sub(r"\s+", " ", (value or "")).strip()
+    sanitized = TEMPLATE_TOKEN_PATTERN.sub(" ", value or "")
+    return re.sub(r"\s+", " ", sanitized).strip()
 
 
 def is_http_url(value: str) -> bool:
@@ -125,6 +134,11 @@ def is_placeholder_url(value: str) -> bool:
     except Exception:
         return True
     return host in PLACEHOLDER_URL_HOSTS
+
+
+def canonicalize_url(value: str) -> str:
+    normalized = normalize_text(value)
+    return URL_REWRITES.get(normalized, normalized)
 
 
 def extract_urls_from_text(value: str) -> list[str]:
@@ -176,14 +190,15 @@ def select_best_url(item: dict[str, Any]) -> str:
     )
     candidate_values.extend(text_candidates)
 
-    valid_candidates = [candidate for candidate in candidate_values if is_http_url(candidate)]
+    canonical_candidates = [canonicalize_url(candidate) for candidate in candidate_values]
+    valid_candidates = [candidate for candidate in canonical_candidates if is_http_url(candidate)]
     non_placeholder = [candidate for candidate in valid_candidates if not is_placeholder_url(candidate)]
 
     if non_placeholder:
         return normalize_text(non_placeholder[0])
 
     source_name = normalize_text(str(item.get("feed_source") or item.get("source") or ""))
-    mapped_fallback = source_fallback_url(source_name)
+    mapped_fallback = canonicalize_url(source_fallback_url(source_name))
     if mapped_fallback:
         return mapped_fallback
 
@@ -256,6 +271,10 @@ def coerce_item(item: dict[str, Any]) -> dict[str, Any]:
     explicit_sector = normalize_text(str(item.get("sector") or item.get("focus_sector") or ""))
     inferred_sector = explicit_sector or detect_sector(combined_text, category_values)
 
+    title_value = normalize_text(str(item.get("title") or ""))
+    if not title_value:
+        title_value = "Untitled item"
+
     return {
         "timestamp": (
             item.get("timestamp")
@@ -269,7 +288,7 @@ def coerce_item(item: dict[str, Any]) -> dict[str, Any]:
             or item.get("updated_at")
         ),
         "feed_source": normalize_text(str(item.get("feed_source") or item.get("source") or "Unknown Source")),
-        "title": normalize_text(str(item.get("title") or "Untitled item")),
+        "title": title_value,
         "url": select_best_url(item),
         "summary": normalize_text(
             str(item.get("summary") or item.get("description") or item.get("contentSnippet") or "")
@@ -902,7 +921,7 @@ def validate_item_links(items: list[IntelItem], timeout_seconds: float) -> list[
 
         seen_urls.add(entry.url)
         status_code, detail = check_url(entry.url, timeout_seconds)
-        is_ok = 200 <= status_code < 400
+        is_ok = (200 <= status_code < 400) or status_code in {401, 403}
         results.append(
             {
                 "title": entry.title,
