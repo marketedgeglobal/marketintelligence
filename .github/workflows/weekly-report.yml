@@ -70,7 +70,7 @@ jobs:
       - name: Guard against unresolved template tokens in HTML
         run: |
           set -euo pipefail
-          unresolved_tokens=$(git grep -nE '\{\{[^{}]+\}\}|\{%[^%]+%\}|\{#[^#]+#\}' -- '*.html' || true)
+          unresolved_tokens=$(git grep -nE '\{\{[^{}]+\}\}|\{%[^%]+%\}|\{#[^#]+#\}|^<<<<<<<|^=======|^>>>>>>>' -- '*.html' || true)
 
           if [ -n "$unresolved_tokens" ]; then
             echo "::error::Unresolved template tokens found in tracked HTML files."

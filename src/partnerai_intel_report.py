@@ -31,6 +31,7 @@ MONEY_PATTERN = re.compile(
 
 URL_PATTERN = re.compile(r"https?://[^\s)\]}>\"']+", re.IGNORECASE)
 TEMPLATE_TOKEN_PATTERN = re.compile(r"\{\{[^{}]+\}\}|\{%[^%]+%\}|\{#[^#]+#\}")
+MERGE_MARKER_PATTERN = re.compile(r"(?m)^\s*(?:<<<<<<<.*|=======|>>>>>>>.*)\s*$")
 PLACEHOLDER_URL_HOSTS = {
     "example.com",
     "www.example.com",
@@ -117,6 +118,7 @@ def parse_timestamp(value: Any) -> datetime | None:
 
 def normalize_text(value: str) -> str:
     sanitized = TEMPLATE_TOKEN_PATTERN.sub(" ", value or "")
+    sanitized = MERGE_MARKER_PATTERN.sub(" ", sanitized)
     return re.sub(r"\s+", " ", sanitized).strip()
 
 
