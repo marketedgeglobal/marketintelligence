@@ -1,5 +1,6 @@
 PartnerAI Link Validation
-Checked links: 3
-Broken links: 0
+Checked links: 2
+Broken links: 1
 
-No broken links detected.
+Broken URL details:
+- [404] https://www.iadb.org/en/news :: Not Found
