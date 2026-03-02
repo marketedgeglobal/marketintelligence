@@ -1,0 +1,50 @@
+name: Generate Primary Research Tracker Report
+
+on:
+  schedule:
+    # Monday 7:00 AM ET (12:00 PM UTC)
+    - cron: '0 12 * * 1'
+  repository_dispatch:
+    types: [zapier_trigger]
+  workflow_dispatch:
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Generate Primary Research Tracker report
+        run: |
+          python src/primary_research_tracker_report.py \
+            --output-dir reports \
+            --index-path index.html
+
+      - name: Commit and push report
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add reports/ index.html
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Primary Research Tracker report - $(date +'%Y-%m-%d')" && git push)
+
+      - name: Report generation status
+        if: success()
+        run: echo "✓ Report generated and published successfully!"
+
+      - name: Error notification
+        if: failure()
+        run: echo "✗ Report generation failed. Check logs for details."
