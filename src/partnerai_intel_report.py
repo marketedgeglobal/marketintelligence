@@ -1038,8 +1038,9 @@ def main() -> None:
     latest_marker = output_dir / "latest-report.txt"
     latest_marker.write_text(str(output_file), encoding="utf-8")
 
-    index_path = Path(args.index_path)
-    index_path.write_text(html_report, encoding="utf-8")
+    # Write to latest-report.html (Zapier integration point)
+    latest_report_file = Path("latest-report.html")
+    latest_report_file.write_text(html_report, encoding="utf-8")
 
     print(f"Generated report: {output_file}")
     print(f"Items processed: {len(raw_items)}")
