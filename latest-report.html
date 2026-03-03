@@ -3,129 +3,487 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Opportunities Report</title>
+    <title>Market Intelligence Report - Development Opportunities</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1, h2, h3 { color: #333; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .highlight { color: green; font-weight: bold; }
-        .filter { margin-bottom: 20px; }
-        .summary { margin: 20px 0; }
-        .link { color: #007BFF; text-decoration: none; }
-        .link:hover { text-decoration: underline; }
-    </style>
-    <script>
-        function filterRecords() {
-            var countryFilter = document.getElementById('countrySelect').value;
-            var sectorFilter = document.getElementById('sectorSelect').value;
-            var rows = document.querySelectorAll('table tbody tr');
-            rows.forEach(row => {
-                var country = row.getAttribute('data-country');
-                var sector = row.getAttribute('data-sector');
-                if ((countryFilter === 'All' || country === countryFilter) && 
-                    (sectorFilter === 'All' || sector === sectorFilter)) {
-                    row.style.display = ''; // Show row
-                } else {
-                    row.style.display = 'none'; // Hide row
-                }
-            });
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-    </script>
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .filters-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .filters-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.3em;
+        }
+        
+        .filter-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-item label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        .filter-item select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        
+        .filter-item select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .country-section {
+            margin-bottom: 40px;
+        }
+        
+        .country-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .country-header h2 {
+            font-size: 1.8em;
+            color: #667eea;
+            margin: 0;
+        }
+        
+        .country-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-left: 15px;
+            font-size: 0.9em;
+        }
+        
+        .opportunity-card {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .opportunity-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+        
+        .opportunity-card.hidden {
+            display: none;
+        }
+        
+        .opportunity-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .opportunity-title a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+        
+        .opportunity-title a:hover {
+            border-bottom-color: #667eea;
+        }
+        
+        .opportunity-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .opportunity-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .meta-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .meta-value {
+            color: #333;
+            font-size: 1em;
+        }
+        
+        .funding-amount {
+            background: #d4edda;
+            color: #155724;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .deadline {
+            background: #fff3cd;
+            color: #856404;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .sector-badge {
+            display: inline-block;
+            background: #e7f3ff;
+            color: #0066cc;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .opportunity-type-badge {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin-right: 8px;
+        }
+        
+        .source-link {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background 0.3s ease;
+        }
+        
+        .source-link:hover {
+            background: #764ba2;
+        }
+        
+        footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e9ecef;
+            font-size: 0.9em;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 1.1em;
+        }
+        
+        @media (max-width: 768px) {
+            .filter-group {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .opportunity-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Opportunities Report</h1>
-    <div class="filter">
-        <label for="countrySelect">Filter by Country:</label>
-        <select id="countrySelect" onchange="filterRecords()">
-            <option value="All">All</option>
-            <option value="Bangladesh">Bangladesh</option>
-            <option value="Bolivia">Bolivia</option>
-            <option value="Myanmar">Myanmar</option>
-            <option value="Regional">Regional Africa</option>
-            <option value="Global">Global</option>
-        </select>
-        <label for="sectorSelect">Filter by Sector:</label>
-        <select id="sectorSelect" onchange="filterRecords()">
-            <option value="All">All</option>
-            <option value="Agribusiness">Agribusiness</option>
-            <option value="Ranching and livestock">Ranching and livestock</option>
-            <option value="Fisheries and aquaculture">Fisheries and aquaculture</option>
-            <option value="Climate and environment">Climate and environment</option>
-            <option value="Other">Other</option>
-        </select>
+    <div class="container">
+        <header>
+            <h1>📊 Market Intelligence Report</h1>
+            <p>Development Opportunities & Funding Alerts</p>
+            <p style="font-size: 0.95em; margin-top: 10px;">Report Generated: March 3, 2026</p>
+        </header>
+        
+        <div class="filters-section">
+            <h2>🔍 Filter Opportunities</h2>
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label for="countryFilter">Country/Region:</label>
+                    <select id="countryFilter" onchange="filterOpportunities()">
+                        <option value="">All Countries/Regions</option>
+                        <option value="Bangladesh">Bangladesh</option>
+                        <option value="Bolivia">Bolivia</option>
+                        <option value="Myanmar">Myanmar</option>
+                        <option value="Regional Africa">Regional (Africa)</option>
+                        <option value="Global">Global</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="sectorFilter">Sector:</label>
+                    <select id="sectorFilter" onchange="filterOpportunities()">
+                        <option value="">All Sectors</option>
+                        <option value="Agribusiness">Agribusiness</option>
+                        <option value="Ranching and livestock">Ranching and livestock</option>
+                        <option value="Fisheries and aquaculture">Fisheries and aquaculture</option>
+                        <option value="Climate and environment">Climate and environment</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Regional Africa Section -->
+            <div class="country-section">
+                <div class="country-header">
+                    <h2>🌍 Regional (Africa)</h2>
+                    <span class="country-badge">2 Opportunities</span>
+                </div>
+                
+                <div class="opportunity-card" data-country="Regional Africa" data-sector="Other" data-type="Humanitarian">
+                    <div class="opportunity-title">
+                        <a href="https://news.un.org/en/story/2026/02/1167038" target="_blank">South Sudan: Funding gaps threaten nearly 2 million displaced people</a>
+                    </div>
+                    <div class="opportunity-description">
+                        Funding shortfalls are putting the lives of more than 1.9 million displaced people in South Sudan at risk amid rising humanitarian needs, the International Organization for Migration (IOM) said on Wednesday.
+                    </div>
+                    <div class="opportunity-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Opportunity Type</span>
+                            <span class="opportunity-type-badge">Humanitarian</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Sector</span>
+                            <span class="sector-badge">Humanitarian Aid</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Publication Date</span>
+                            <span class="meta-value">February 25, 2026</span>
+                        </div>
+                    </div>
+                    <div class="opportunity-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Source</span>
+                            <span class="meta-value">UN News - Humanitarian Aid</span>
+                        </div>
+                    </div>
+                    <a href="https://news.un.org/en/story/2026/02/1167038" target="_blank" class="source-link">View Full Opportunity →</a>
+                </div>
+                
+                <div class="opportunity-card" data-country="Regional Africa" data-sector="Other" data-type="Humanitarian">
+                    <div class="opportunity-title">
+                        <a href="https://news.un.org/en/story/2026/02/1167026" target="_blank">Somalia: Number of people going hungry nearly doubles in a year</a>
+                    </div>
+                    <div class="opportunity-description">
+                        The number of people in Somalia facing acute food insecurity has nearly doubled to 6.5 million since last year as hunger levels rise due to worsening drought, conflict and soaring food prices.
+                    </div>
+                    <div class="opportunity-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Opportunity Type</span>
+                            <span class="opportunity-type-badge">Humanitarian</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Sector</span>
+                            <span class="sector-badge">Climate and environment</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Publication Date</span>
+                            <span class="meta-value">February 24, 2026</span>
+                        </div>
+                    </div>
+                    <div class="opportunity-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Source</span>
+                            <span class="meta-value">UN News - Humanitarian Aid</span>
+                        </div>
+                    </div>
+                    <a href="https://news.un.org/en/story/2026/02/1167026" target="_blank" class="source-link">View Full Opportunity →</a>
+                </div>
+            </div>
+            
+            <!-- Global Section -->
+            <div class="country-section">
+                <div class="country-header">
+                    <h2>🌐 Global</h2>
+                    <span class="country-badge">2 Opportunities</span>
+                </div>
+                
+                <div class="opportunity-card" data-country="Global" data-sector="Other" data-type="Development programs">
+                    <div class="opportunity-title">
+                        <a href="https://news.un.org/en/story/2026/01/1166717" target="_blank">Global economy shows signs of steady but subdued growth</a>
+                    </div>
+                    <div class="opportunity-description">
+                        The global economy has shown resilience amid turbulence during the past year, including shifting trade policies – yet growth remains subdued and far below pre-pandemic levels, the UN said in a landmark report published on Thursday.
+                    </div>
+                    <div class="opportunity-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Opportunity Type</span>
+                            <span class="opportunity-type-badge">Development programs</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Sector</span>
+                            <span class="sector-badge">Economic Development</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Publication Date</span>
+                            <span class="meta-value">January 8, 2026</span>
+                        </div>
+                    </div>
+                    <div class="opportunity-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Source</span>
+                            <span class="meta-value">UN News - Economic Development</span>
+                        </div>
+                    </div>
+                    <a href="https://news.un.org/en/story/2026/01/1166717" target="_blank" class="source-link">View Full Opportunity →</a>
+                </div>
+                
+                <div class="opportunity-card" data-country="Global" data-sector="Other" data-type="Development programs">
+                    <div class="opportunity-title">
+                        <a href="https://news.un.org/en/story/2026/02/1166934" target="_blank">In Bahrain; work, dignity and the quiet rise of home-grown enterprise</a>
+                    </div>
+                    <div class="opportunity-description">
+                        From a crochet hook in a Cairo living room to digital marketplaces reaching across borders, women entrepreneurs are demonstrating how creativity, persistence and targeted support can translate into livelihoods — even when formal employment is out of reach.
+                    </div>
+                    <div class="opportunity-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Opportunity Type</span>
+                            <span class="opportunity-type-badge">Development programs</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Sector</span>
+                            <span class="sector-badge">Agribusiness</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Publication Date</span>
+                            <span class="meta-value">February 10, 2026</span>
+                        </div>
+                    </div>
+                    <div class="opportunity-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Source</span>
+                            <span class="meta-value">UN News - Economic Development</span>
+                        </div>
+                    </div>
+                    <a href="https://news.un.org/en/story/2026/02/1166934" target="_blank" class="source-link">View Full Opportunity →</a>
+                </div>
+            </div>
+            
+            <div id="noResults" class="no-results" style="display: none;">
+                No opportunities match your selected filters. Please try different criteria.
+            </div>
+        </div>
+        
+        <footer>
+            <p><strong>Report Generated:</strong> March 3, 2026 at 03:36 UTC</p>
+            <p><strong>Data Sources:</strong> UN News (Humanitarian Aid & Economic Development), ReliefWeb, World Bank, USAID, EU TED, UNHCR, UN OCHA, African Development Bank, Inter-American Development Bank, Green Climate Fund, Global Environment Facility, United Nations Global Marketplace</p>
+            <p>This report is automatically generated weekly on Mondays at 7:00 AM ET. All opportunity links point to original RSS feed sources.</p>
+        </footer>
     </div>
-
-    <div class="summary">
-        <h2>Summary of Opportunities</h2>
-        <p><strong>Bangladesh:</strong> 5</p>
-        <p><strong>Bolivia:</strong> 2</p>
-        <p><strong>Myanmar:</strong> 3</p>
-        <p><strong>Regional Africa:</strong> 4</p>
-        <p><strong>Global:</strong> 10</p>
-    </div>
-
-    <h2>Opportunities</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Funding Amount</th>
-                <th>Deadline</th>
-                <th>Source</th>
-                <th>Publication Date</th>
-                <th>Link</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr data-country="Bangladesh" data-sector="Agribusiness">
-                <td>Opportunity in Bangladesh's Agribusiness Sector</td>
-                <td>Funding available for agribusiness development initiatives in rural Bangladesh.</td>
-                <td class="highlight">$1,000,000</td>
-                <td class="highlight">2024-06-30</td>
-                <td>ADB</td>
-                <td>2024-03-01</td>
-                <td><a href="#" class="link">View Opportunity</a></td>
-            </tr>
-            <tr data-country="Bolivia" data-sector="Fisheries and aquaculture">
-                <td>Fisheries Aid Fund in Bolivia</td>
-                <td>Grants available for sustainable fishing initiatives.</td>
-                <td class="highlight">$500,000</td>
-                <td class="highlight">2024-05-15</td>
-                <td>UN OCHA</td>
-                <td>2024-02-20</td>
-                <td><a href="#" class="link">View Opportunity</a></td>
-            </tr>
-            <tr data-country="Myanmar" data-sector="Climate and environment">
-                <td>Climate Resilience in Myanmar</td>
-                <td>Development program focused on enhancing climate resilience.</td>
-                <td class="highlight">$750,000</td>
-                <td class="highlight">2024-08-01</td>
-                <td>World Bank</td>
-                <td>2024-01-15</td>
-                <td><a href="#" class="link">View Opportunity</a></td>
-            </tr>
-            <tr data-country="Regional" data-sector="Ranching and livestock">
-                <td>Livestock Development for Africa</td>
-                <td>Tenders for livestock development projects in Regional Africa.</td>
-                <td>Not specified</td>
-                <td>2024-10-10</td>
-                <td>AfDB</td>
-                <td>2024-03-10</td>
-                <td><a href="#" class="link">View Opportunity</a></td>
-            </tr>
-            <tr data-country="Global" data-sector="Other">
-                <td>Global Development Funding</td>
-                <td>Open grants for development initiatives globally.</td>
-                <td class="highlight">$20,000,000</td>
-                <td class="highlight">2024-12-30</td>
-                <td>GCF</td>
-                <td>2024-02-28</td>
-                <td><a href="#" class="link">View Opportunity</a></td>
-            </tr>
-        </tbody>
-    </table>
+    
+    <script>
+        function filterOpportunities() {
+            const countryFilter = document.getElementById('countryFilter').value;
+            const sectorFilter = document.getElementById('sectorFilter').value;
+            const cards = document.querySelectorAll('.opportunity-card');
+            let visibleCount = 0;
+            
+            cards.forEach(card => {
+                const cardCountry = card.getAttribute('data-country');
+                const cardSector = card.getAttribute('data-sector');
+                
+                const countryMatch = !countryFilter || cardCountry === countryFilter;
+                const sectorMatch = !sectorFilter || cardSector === sectorFilter;
+                
+                if (countryMatch && sectorMatch) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+            
+            const noResults = document.getElementById('noResults');
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
