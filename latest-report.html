@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opportunities Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2, h3 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .highlight { color: green; font-weight: bold; }
+        .filter { margin-bottom: 20px; }
+        .summary { margin: 20px 0; }
+        .link { color: #007BFF; text-decoration: none; }
+        .link:hover { text-decoration: underline; }
+    </style>
+    <script>
+        function filterRecords() {
+            var countryFilter = document.getElementById('countrySelect').value;
+            var sectorFilter = document.getElementById('sectorSelect').value;
+            var rows = document.querySelectorAll('table tbody tr');
+            rows.forEach(row => {
+                var country = row.getAttribute('data-country');
+                var sector = row.getAttribute('data-sector');
+                if ((countryFilter === 'All' || country === countryFilter) && 
+                    (sectorFilter === 'All' || sector === sectorFilter)) {
+                    row.style.display = ''; // Show row
+                } else {
+                    row.style.display = 'none'; // Hide row
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Opportunities Report</h1>
+    <div class="filter">
+        <label for="countrySelect">Filter by Country:</label>
+        <select id="countrySelect" onchange="filterRecords()">
+            <option value="All">All</option>
+            <option value="Bangladesh">Bangladesh</option>
+            <option value="Bolivia">Bolivia</option>
+            <option value="Myanmar">Myanmar</option>
+            <option value="Regional">Regional Africa</option>
+            <option value="Global">Global</option>
+        </select>
+        <label for="sectorSelect">Filter by Sector:</label>
+        <select id="sectorSelect" onchange="filterRecords()">
+            <option value="All">All</option>
+            <option value="Agribusiness">Agribusiness</option>
+            <option value="Ranching and livestock">Ranching and livestock</option>
+            <option value="Fisheries and aquaculture">Fisheries and aquaculture</option>
+            <option value="Climate and environment">Climate and environment</option>
+            <option value="Other">Other</option>
+        </select>
+    </div>
+
+    <div class="summary">
+        <h2>Summary of Opportunities</h2>
+        <p><strong>Bangladesh:</strong> 5</p>
+        <p><strong>Bolivia:</strong> 2</p>
+        <p><strong>Myanmar:</strong> 3</p>
+        <p><strong>Regional Africa:</strong> 4</p>
+        <p><strong>Global:</strong> 10</p>
+    </div>
+
+    <h2>Opportunities</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Funding Amount</th>
+                <th>Deadline</th>
+                <th>Source</th>
+                <th>Publication Date</th>
+                <th>Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-country="Bangladesh" data-sector="Agribusiness">
+                <td>Opportunity in Bangladesh's Agribusiness Sector</td>
+                <td>Funding available for agribusiness development initiatives in rural Bangladesh.</td>
+                <td class="highlight">$1,000,000</td>
+                <td class="highlight">2024-06-30</td>
+                <td>ADB</td>
+                <td>2024-03-01</td>
+                <td><a href="#" class="link">View Opportunity</a></td>
+            </tr>
+            <tr data-country="Bolivia" data-sector="Fisheries and aquaculture">
+                <td>Fisheries Aid Fund in Bolivia</td>
+                <td>Grants available for sustainable fishing initiatives.</td>
+                <td class="highlight">$500,000</td>
+                <td class="highlight">2024-05-15</td>
+                <td>UN OCHA</td>
+                <td>2024-02-20</td>
+                <td><a href="#" class="link">View Opportunity</a></td>
+            </tr>
+            <tr data-country="Myanmar" data-sector="Climate and environment">
+                <td>Climate Resilience in Myanmar</td>
+                <td>Development program focused on enhancing climate resilience.</td>
+                <td class="highlight">$750,000</td>
+                <td class="highlight">2024-08-01</td>
+                <td>World Bank</td>
+                <td>2024-01-15</td>
+                <td><a href="#" class="link">View Opportunity</a></td>
+            </tr>
+            <tr data-country="Regional" data-sector="Ranching and livestock">
+                <td>Livestock Development for Africa</td>
+                <td>Tenders for livestock development projects in Regional Africa.</td>
+                <td>Not specified</td>
+                <td>2024-10-10</td>
+                <td>AfDB</td>
+                <td>2024-03-10</td>
+                <td><a href="#" class="link">View Opportunity</a></td>
+            </tr>
+            <tr data-country="Global" data-sector="Other">
+                <td>Global Development Funding</td>
+                <td>Open grants for development initiatives globally.</td>
+                <td class="highlight">$20,000,000</td>
+                <td class="highlight">2024-12-30</td>
+                <td>GCF</td>
+                <td>2024-02-28</td>
+                <td><a href="#" class="link">View Opportunity</a></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
